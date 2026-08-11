@@ -1,5 +1,7 @@
 # tivis.r
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21889970.svg)](https://doi.org/10.5281/zenodo.21889970)
+
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/CTTIR/tivis.r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CTTIR/tivis.r/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -87,3 +89,11 @@ suite round-trips a cube whose every sample is uniquely identifiable.
 ## License
 
 MIT
+
+## Citation
+
+If you use this software, please cite it as:
+
+> Heller, R. (2026). *tivis.r: Reading Diaspective Vision TIVITA hyperspectral recordings* (Version 0.1.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.21889970
+
+DOI: [10.5281/zenodo.21889970](https://doi.org/10.5281/zenodo.21889970)
