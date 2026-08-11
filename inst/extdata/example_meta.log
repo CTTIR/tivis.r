@@ -1,0 +1,18 @@
+[Camera]
+CamID = "0000-00000"
+Exposure = 90
+analoger Gain = 8
+digitaler Gain = 32
+Speed = 950
+
+[SW]
+Name = "TIVITA® Suite"
+Version = "1.6.0.1"
+
+[Fremdlichterkennung]
+Fremdlicht erkannt? = FALSE
+PixelmitFremdlicht = 0
+Intensity Grenzwert = 7,000000
+
+[Aufnahme]
+Aufnahmemodus = "Reflektanz"

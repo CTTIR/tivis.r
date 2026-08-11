@@ -1,0 +1,36 @@
+Package: tivis.r
+Title: Read Diaspective Vision TIVITA Hyperspectral Recordings
+Version: 0.1.0
+Authors@R: person("R.", "Heller", email = "raban.heller@charite.de",
+    role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8006-9742"))
+Description: Reads hyperspectral imaging data written by the Diaspective
+    Vision TIVITA Suite, used for intraoperative tissue and perfusion imaging.
+    Parses the binary 'SpecCube.dat' container (big-endian float32 samples in
+    band-interleaved-by-pixel order behind a 12-byte dimension header), the
+    German-language acquisition metadata log, and the parameter images the
+    Suite exports alongside each recording (oxygenation, NIR perfusion, tissue
+    haemoglobin and water indices). Requires no vendor SDK and contains no
+    compiled code. Companion to 'cuvis.r', which covers Cubert snapshot
+    cameras, and a data source for 'hyperspectR'.
+License: MIT + file LICENSE
+URL: https://github.com/cttir/tivis.r, https://cttir.github.io/tivis.r/
+BugReports: https://github.com/cttir/tivis.r/issues
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.1.0)
+Imports:
+    cli,
+    stats
+Suggests:
+    testthat (>= 3.0.0),
+    withr,
+    knitr,
+    rmarkdown,
+    covr,
+    png
+Config/testthat/edition: 3
+VignetteBuilder: knitr
+Config/Needs/website: CTTIR/themakR
+Config/roxygen2/version: 8.0.0

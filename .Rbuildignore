@@ -1,0 +1,15 @@
+^\.data$
+^data-raw$
+^\.github$
+^docs$
+^pkgdown$
+^_pkgdown\.ya?ml$
+^README\.Rmd$
+^cran-comments\.md$
+^LICENSE\.md$
+^\.lintr$
+^codecov\.yml$
+^_coverage$
+^\.Rproj\.user$
+^.*\.Rproj$
+^LICENSE\.mine$
