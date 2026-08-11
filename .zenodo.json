@@ -1,0 +1,35 @@
+{
+  "upload_type": "software",
+  "title": "tivis.r: Reading Diaspective Vision TIVITA hyperspectral recordings",
+  "version": "0.1.0",
+  "publication_date": "2026-08-11",
+  "description": "<p>tivis.r reads hyperspectral imaging data written by the Diaspective Vision TIVITA Suite, a system used for intraoperative tissue and perfusion imaging. It parses the binary spectral cube container directly, together with the German-language acquisition metadata log and the parameter images the Suite exports alongside each recording, covering oxygenation, near-infrared perfusion, and tissue haemoglobin and water indices. The package requires no vendor software development kit and contains no compiled code, so recordings can be read on any system running R. It is a companion to cuvis.r, which covers Cubert snapshot cameras, and is aimed at surgical and biomedical researchers working with TIVITA data.</p>",
+  "creators": [
+    {
+      "name": "Heller, Raban",
+      "orcid": "0000-0001-8006-9742"
+    }
+  ],
+  "contributors": [],
+  "license": "mit",
+  "access_right": "open",
+  "language": "eng",
+  "keywords": [
+    "hyperspectral",
+    "tivita",
+    "perfusion-imaging",
+    "intraoperative-imaging",
+    "medical-imaging",
+    "r-package",
+    "rstats"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/CTTIR/tivis.r",
+      "relation": "isSupplementTo",
+      "scheme": "url",
+      "resource_type": "software"
+    }
+  ],
+  "notes": "Prepared draft. Not yet published."
+}
