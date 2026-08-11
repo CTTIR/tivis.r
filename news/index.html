@@ -76,8 +76,10 @@
 <code><a href="../reference/tivis_measurement.html">tivis_measurement()</a></code> bundles cube, wavelengths, metadata, references and timestamp for a single capture.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="format-notes-0-1-0">Format notes<a class="anchor" aria-label="anchor" href="#format-notes-0-1-0"></a></h3>
-<p>The container is undocumented by the vendor. The layout implemented here — big-endian <code>float32</code> in band-interleaved-by-pixel order behind three big-endian <code>uint32</code> dimensions, with a 500–995 nm axis in 5 nm steps — was established empirically and validated against the Suite’s own RGB exports across 363 clinical recordings.</p>
+<h3 id="known-limitation-spatial-layout-0-1-0">Known limitation: spatial layout<a class="anchor" aria-label="anchor" href="#known-limitation-spatial-layout-0-1-0"></a></h3>
+<p>The container is undocumented by the vendor. The header, sample type (big-endian <code>float32</code>) and wavelength axis (500–995 nm in 5 nm steps) are settled. <strong>The ordering of samples within a band is not.</strong></p>
+<p><code><a href="../reference/tivis_read_cube.html">tivis_read_cube()</a></code> currently assumes band-interleaved-by-pixel ordering, which produces band images tiled four times horizontally and heavily striped. Do not use the returned images for analysis until this is resolved.</p>
+<p>An earlier draft of this file claimed the layout had been validated against the vendor’s RGB exports at <code>r = 0.86</code>. That measurement was taken on downsampled images, and the reference is dominated by horizontal structure that survives horizontal tiling, so a wrong layout scored well. At full resolution — and on visual inspection — it is clearly incorrect.</p>
 </div>
 </div>
   </div>
