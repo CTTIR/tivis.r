@@ -23,10 +23,18 @@ vendor SDK, no compiled code.
 * `tivis_measurement()` bundles cube, wavelengths, metadata, references and
   timestamp for a single capture.
 
-## Format notes
+## Known limitation: spatial layout
 
-The container is undocumented by the vendor. The layout implemented here —
-big-endian `float32` in band-interleaved-by-pixel order behind three big-endian
-`uint32` dimensions, with a 500–995 nm axis in 5 nm steps — was established
-empirically and validated against the Suite's own RGB exports across 363
-clinical recordings.
+The container is undocumented by the vendor. The header, sample type
+(big-endian `float32`) and wavelength axis (500–995 nm in 5 nm steps) are
+settled. **The ordering of samples within a band is not.**
+
+`tivis_read_cube()` currently assumes band-interleaved-by-pixel ordering, which
+produces band images tiled four times horizontally and heavily striped. Do not
+use the returned images for analysis until this is resolved.
+
+An earlier draft of this file claimed the layout had been validated against the
+vendor's RGB exports at `r = 0.86`. That measurement was taken on downsampled
+images, and the reference is dominated by horizontal structure that survives
+horizontal tiling, so a wrong layout scored well. At full resolution — and on
+visual inspection — it is clearly incorrect.
