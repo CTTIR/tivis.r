@@ -1,9 +1,10 @@
-# tivis.r
+# tivis.r <img src="man/figures/logo.svg" align="right" height="180" alt="tivis.r logo" />
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21889970.svg)](https://doi.org/10.5281/zenodo.21889970)
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/CTTIR/tivis.r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CTTIR/tivis.r/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/CTTIR/tivis.r/actions/workflows/pkgdown.yaml/badge.svg)](https://cttir.github.io/tivis.r/)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 

@@ -1,0 +1,260 @@
+<svg width="500" height="580" viewBox="0 0 500 580" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgtivis" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0%" stop-color="#04060e"/>
+      <stop offset="100%" stop-color="#01040a"/>
+    </linearGradient>
+    <!-- Raw binary cube face — dark -->
+    <linearGradient id="rawTopT" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a1a2e"/>
+      <stop offset="100%" stop-color="#05101c"/>
+    </linearGradient>
+    <linearGradient id="rawFrontT" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#061020"/>
+      <stop offset="100%" stop-color="#030a15"/>
+    </linearGradient>
+    <linearGradient id="rawSideT" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#040c18"/>
+      <stop offset="100%" stop-color="#0a1c30"/>
+    </linearGradient>
+    <!-- Calibrated cube face — clean -->
+    <linearGradient id="calTopT" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a2a2e"/>
+      <stop offset="100%" stop-color="#05181a"/>
+    </linearGradient>
+    <linearGradient id="calFrontT" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#082022"/>
+      <stop offset="100%" stop-color="#041012"/>
+    </linearGradient>
+    <linearGradient id="calSideT" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#061414"/>
+      <stop offset="100%" stop-color="#0d2828"/>
+    </linearGradient>
+    <!-- TIVITA perfusion spectral gradient (NIR-weighted: blue→green→red) -->
+    <linearGradient id="specTopT" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#1133cc" stop-opacity="0.45"/>
+      <stop offset="30%"  stop-color="#00aaff" stop-opacity="0.45"/>
+      <stop offset="55%"  stop-color="#00cc77" stop-opacity="0.45"/>
+      <stop offset="78%"  stop-color="#ffaa00" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#dd1122" stop-opacity="0.45"/>
+    </linearGradient>
+    <clipPath id="hextivis">
+      <polygon points="250,30 455,145 455,375 250,490 45,375 45,145"/>
+    </clipPath>
+  </defs>
+
+  <polygon points="250,30 455,145 455,375 250,490 45,375 45,145" fill="url(#bgtivis)"/>
+
+  <g clip-path="url(#hextivis)">
+
+    <!-- Faint grid -->
+    <line x1="45"  y1="190" x2="455" y2="190" stroke="#0a1c30" stroke-width="0.4" opacity="0.35"/>
+    <line x1="45"  y1="240" x2="455" y2="240" stroke="#0a1c30" stroke-width="0.4" opacity="0.35"/>
+    <line x1="45"  y1="290" x2="455" y2="290" stroke="#0a1c30" stroke-width="0.4" opacity="0.35"/>
+    <line x1="45"  y1="340" x2="455" y2="340" stroke="#0a1c30" stroke-width="0.4" opacity="0.35"/>
+    <line x1="45"  y1="390" x2="455" y2="390" stroke="#0a1c30" stroke-width="0.4" opacity="0.35"/>
+    <line x1="150" y1="145" x2="150" y2="490" stroke="#0a1c30" stroke-width="0.4" opacity="0.35"/>
+    <line x1="250" y1="145" x2="250" y2="490" stroke="#0a1c30" stroke-width="0.4" opacity="0.35"/>
+    <line x1="350" y1="145" x2="350" y2="490" stroke="#0a1c30" stroke-width="0.4" opacity="0.35"/>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- LEFT CUBE — raw .dat binary container (dark)          -->
+    <!-- ══════════════════════════════════════════════════════ -->
+
+    <!-- Top face -->
+    <polygon points="88,188 158,158 208,188 138,218"
+      fill="url(#rawTopT)" stroke="#0F6E56" stroke-width="1.2" opacity="0.92"/>
+    <!-- Binary digits texture on raw top (the plain binary format) -->
+    <text font-family="monospace" font-size="5" fill="#1D9E75" opacity="0.4" x="104" y="186">01001</text>
+    <text font-family="monospace" font-size="5" fill="#1D9E75" opacity="0.35" x="128" y="178">1010</text>
+    <text font-family="monospace" font-size="5" fill="#0F6E56" opacity="0.4" x="150" y="185">0110</text>
+    <text font-family="monospace" font-size="5" fill="#1D9E75" opacity="0.3" x="120" y="197">10011</text>
+
+    <!-- Front face -->
+    <polygon points="88,218 138,218 138,308 88,308"
+      fill="url(#rawFrontT)" stroke="#0F6E56" stroke-width="1.2" opacity="0.92"/>
+    <!-- float32 stream — vertical byte columns (column-major hint) -->
+    <line x1="98"  y1="222" x2="98"  y2="304" stroke="#1D9E75" stroke-width="0.7" opacity="0.28"/>
+    <line x1="108" y1="222" x2="108" y2="304" stroke="#0F6E56" stroke-width="0.6" opacity="0.22"/>
+    <line x1="118" y1="222" x2="118" y2="304" stroke="#1D9E75" stroke-width="0.7" opacity="0.26"/>
+    <line x1="128" y1="222" x2="128" y2="304" stroke="#0F6E56" stroke-width="0.6" opacity="0.2"/>
+    <!-- byte-value dots -->
+    <circle cx="98"  cy="240" r="1.3" fill="#1D9E75" opacity="0.35"/>
+    <circle cx="118" cy="258" r="1.3" fill="#1D9E75" opacity="0.32"/>
+    <circle cx="108" cy="278" r="1.2" fill="#0F6E56" opacity="0.3"/>
+    <circle cx="128" cy="290" r="1.2" fill="#1D9E75" opacity="0.28"/>
+
+    <!-- Right side face -->
+    <polygon points="138,218 208,188 208,278 138,308"
+      fill="url(#rawSideT)" stroke="#0F6E56" stroke-width="1.2" opacity="0.92"/>
+    <!-- band stripes (dark) -->
+    <polygon points="138,225 208,195 208,205 138,235" fill="#12503C" opacity="0.35"/>
+    <polygon points="138,240 208,210 208,220 138,250" fill="#12503C" opacity="0.3"/>
+    <polygon points="138,255 208,225 208,235 138,265" fill="#12503C" opacity="0.28"/>
+    <polygon points="138,270 208,240 208,250 138,280" fill="#12503C" opacity="0.25"/>
+    <polygon points="138,285 208,255 208,265 138,295" fill="#12503C" opacity="0.22"/>
+
+    <!-- Cube label -->
+    <text font-family="monospace" font-size="7.5" font-weight="700"
+      fill="#1D9E75" opacity="0.7" text-anchor="middle" x="148" y="325">.dat</text>
+    <text font-family="monospace" font-size="6.5"
+      fill="#0F6E56" opacity="0.55" text-anchor="middle" x="148" y="335">binary cube</text>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- CENTRE — direct read (NO SDK, no compiled code)       -->
+    <!-- Simple bracket/parser glyph instead of a gear         -->
+    <!-- ══════════════════════════════════════════════════════ -->
+
+    <!-- Reader ring -->
+    <circle cx="250" cy="268" r="34" fill="none" stroke="#1D9E75" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="250" cy="268" r="26" fill="#04120e" stroke="#00897B" stroke-width="1.2" opacity="0.85"/>
+
+    <!-- Code brackets — pure-R read, no SDK -->
+    <text font-family="monospace" font-size="26" font-weight="700"
+      fill="#1D9E75" text-anchor="middle" x="250" y="278" opacity="0.9">{ }</text>
+
+    <!-- R binding label above -->
+    <rect x="226" y="218" width="48" height="16" rx="4"
+      fill="#04120e" stroke="#00897B" stroke-width="1" opacity="0.9"/>
+    <text font-family="monospace" font-size="7.5" font-weight="700"
+      fill="#80CBC4" text-anchor="middle" x="250" y="230" opacity="0.92">tivis.r</text>
+
+    <!-- read label below -->
+    <text font-family="monospace" font-size="6.5"
+      fill="#00897B" opacity="0.65" text-anchor="middle" x="250" y="316">read_cube()</text>
+    <!-- no-SDK annotation -->
+    <text font-family="monospace" font-size="5.5"
+      fill="#0F6E56" opacity="0.55" text-anchor="middle" x="250" y="325">no SDK</text>
+
+    <!-- Arrow: left cube → reader -->
+    <line x1="210" y1="250" x2="224" y2="258"
+      stroke="#1D9E75" stroke-width="1.8" opacity="0.6" stroke-linecap="round"/>
+    <polygon points="220,254 228,262 224,252" fill="#1D9E75" opacity="0.6"/>
+
+    <!-- Arrow: reader → right cube -->
+    <line x1="276" y1="258" x2="290" y2="250"
+      stroke="#1D9E75" stroke-width="1.8" opacity="0.6" stroke-linecap="round"/>
+    <polygon points="286,246 294,254 284,256" fill="#1D9E75" opacity="0.6"/>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- RIGHT CUBE — calibrated reflectance (clean, spectral) -->
+    <!-- ══════════════════════════════════════════════════════ -->
+
+    <!-- Top face with perfusion spectral colours -->
+    <polygon points="292,188 362,158 412,188 342,218"
+      fill="url(#calTopT)" stroke="#1D9E75" stroke-width="1.2" opacity="0.92"/>
+    <polygon points="292,188 362,158 412,188 342,218"
+      fill="url(#specTopT)" opacity="0.8"/>
+    <line x1="302" y1="193" x2="352" y2="168" stroke="#1D9E75" stroke-width="0.5" opacity="0.3"/>
+    <line x1="322" y1="203" x2="372" y2="178" stroke="#1D9E75" stroke-width="0.5" opacity="0.3"/>
+    <line x1="342" y1="178" x2="392" y2="203" stroke="#1D9E75" stroke-width="0.5" opacity="0.25"/>
+    <line x1="322" y1="168" x2="372" y2="193" stroke="#1D9E75" stroke-width="0.5" opacity="0.25"/>
+
+    <!-- Front face -->
+    <polygon points="292,218 342,218 342,308 292,308"
+      fill="url(#calFrontT)" stroke="#1D9E75" stroke-width="1.2" opacity="0.92"/>
+    <!-- normalised spectrum lines -->
+    <line x1="294" y1="230" x2="340" y2="230" stroke="#1D9E75" stroke-width="1"   opacity="0.35"/>
+    <line x1="294" y1="242" x2="340" y2="242" stroke="#1D9E75" stroke-width="0.7" opacity="0.28"/>
+    <line x1="294" y1="254" x2="340" y2="254" stroke="#1D9E75" stroke-width="1"   opacity="0.35"/>
+    <line x1="294" y1="266" x2="340" y2="266" stroke="#1D9E75" stroke-width="0.7" opacity="0.28"/>
+    <line x1="294" y1="278" x2="340" y2="278" stroke="#1D9E75" stroke-width="1"   opacity="0.32"/>
+    <line x1="294" y1="290" x2="340" y2="290" stroke="#1D9E75" stroke-width="0.7" opacity="0.25"/>
+    <!-- Reflectance / perfusion curve -->
+    <path d="M 294,282 Q 305,262 317,270 Q 328,278 340,254"
+      fill="none" stroke="#80CBC4" stroke-width="1.5" opacity="0.7" stroke-linecap="round"/>
+
+    <!-- Right side — clean spectral bands (500–995 nm) -->
+    <polygon points="342,218 412,188 412,278 342,308"
+      fill="url(#calSideT)" stroke="#1D9E75" stroke-width="1.2" opacity="0.92"/>
+    <polygon points="342,220 412,190 412,200 342,230" fill="#1133cc" opacity="0.45"/>
+    <polygon points="342,232 412,202 412,212 342,242" fill="#00aaff" opacity="0.45"/>
+    <polygon points="342,244 412,214 412,224 342,254" fill="#00cc77" opacity="0.45"/>
+    <polygon points="342,256 412,226 412,236 342,266" fill="#aaee00" opacity="0.42"/>
+    <polygon points="342,268 412,238 412,248 342,278" fill="#ffaa00" opacity="0.42"/>
+    <polygon points="342,280 412,250 412,260 342,290" fill="#ff3300" opacity="0.4"/>
+    <polygon points="342,292 412,262 412,272 342,302" fill="#aa0011" opacity="0.38"/>
+    <line x1="342" y1="232" x2="412" y2="202" stroke="#000" stroke-width="0.4" opacity="0.3"/>
+    <line x1="342" y1="244" x2="412" y2="214" stroke="#000" stroke-width="0.4" opacity="0.3"/>
+    <line x1="342" y1="256" x2="412" y2="226" stroke="#000" stroke-width="0.4" opacity="0.3"/>
+    <line x1="342" y1="268" x2="412" y2="238" stroke="#000" stroke-width="0.4" opacity="0.3"/>
+    <line x1="342" y1="280" x2="412" y2="250" stroke="#000" stroke-width="0.4" opacity="0.3"/>
+    <line x1="342" y1="292" x2="412" y2="262" stroke="#000" stroke-width="0.4" opacity="0.3"/>
+
+    <!-- Cube label -->
+    <text font-family="monospace" font-size="7.5" font-weight="700"
+      fill="#1D9E75" opacity="0.75" text-anchor="middle" x="352" y="325">reflectance</text>
+    <text font-family="monospace" font-size="6.5"
+      fill="#80CBC4" opacity="0.55" text-anchor="middle" x="352" y="335">500–995 nm</text>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TIVITA REFERENCE-MAP BADGES — bottom                  -->
+    <!-- The real derived maps: NIR-Perfusion, Oxygenation,    -->
+    <!-- THI, TWI                                              -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <rect x="86"  y="355" width="66" height="18" rx="4"
+      fill="#08382C" stroke="#0F6E56" stroke-width="1" opacity="0.9"/>
+    <text font-family="monospace" font-size="7" font-weight="700"
+      fill="#1D9E75" text-anchor="middle" x="119" y="367" opacity="0.9">Perfusion</text>
+
+    <rect x="158" y="355" width="42" height="18" rx="4"
+      fill="#08382C" stroke="#0F6E56" stroke-width="1" opacity="0.9"/>
+    <text font-family="monospace" font-size="7" font-weight="700"
+      fill="#1D9E75" text-anchor="middle" x="179" y="367" opacity="0.9">StO₂</text>
+
+    <rect x="206" y="355" width="40" height="18" rx="4"
+      fill="#08382C" stroke="#0F6E56" stroke-width="1" opacity="0.9"/>
+    <text font-family="monospace" font-size="7" font-weight="700"
+      fill="#1D9E75" text-anchor="middle" x="226" y="367" opacity="0.9">THI</text>
+
+    <rect x="252" y="355" width="40" height="18" rx="4"
+      fill="#08382C" stroke="#0F6E56" stroke-width="1" opacity="0.9"/>
+    <text font-family="monospace" font-size="7" font-weight="700"
+      fill="#1D9E75" text-anchor="middle" x="272" y="367" opacity="0.9">TWI</text>
+
+    <text font-family="monospace" font-size="10" fill="#80CBC4" text-anchor="middle" x="305" y="368" opacity="0.55">→</text>
+
+    <rect x="316" y="355" width="52" height="18" rx="4"
+      fill="#08382C" stroke="#1D9E75" stroke-width="1.2" opacity="0.92"/>
+    <text font-family="monospace" font-size="7" font-weight="700"
+      fill="#80CBC4" text-anchor="middle" x="342" y="367" opacity="0.95">hsi_cube</text>
+
+    <!-- feeds hyperspectR note -->
+    <text font-family="monospace" font-size="7" fill="#2a4a44" opacity="0.6"
+      text-anchor="middle" x="250" y="390">feeds hyperspectR</text>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TIVITA CAMERA HINT — top centre                       -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <rect x="218" y="148" width="64" height="38" rx="5"
+      fill="#05101c" stroke="#0F6E56" stroke-width="1.2" opacity="0.9"/>
+    <!-- Lens -->
+    <circle cx="250" cy="167" r="12" fill="#030a15" stroke="#1D9E75" stroke-width="1.2" opacity="0.9"/>
+    <circle cx="250" cy="167" r="8"  fill="#06141c" stroke="#0F6E56" stroke-width="0.8" opacity="0.85"/>
+    <circle cx="250" cy="167" r="4"  fill="#0a1c30" opacity="0.9"/>
+    <circle cx="247" cy="164" r="1.5" fill="#80CBC4" opacity="0.45"/>
+    <!-- body details -->
+    <rect x="222" y="150" width="10" height="5" rx="1.5" fill="#0a1c30" stroke="#0F6E56" stroke-width="0.8" opacity="0.7"/>
+    <circle cx="272" cy="153" r="3" fill="#0a1c30" stroke="#0F6E56" stroke-width="0.8" opacity="0.7"/>
+    <!-- TIVITA label -->
+    <text font-family="monospace" font-size="6" fill="#0F6E56" opacity="0.65"
+      text-anchor="middle" x="250" y="145">TIVITA</text>
+
+    <!-- Beams from camera to cubes -->
+    <line x1="230" y1="186" x2="175" y2="195"
+      stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.32"/>
+    <line x1="270" y1="186" x2="325" y2="195"
+      stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.3"/>
+
+  </g>
+
+  <!-- Hex border — parser teal (same group as cuvis.r) -->
+  <polygon points="250,30 455,145 455,375 250,490 45,375 45,145"
+    fill="none" stroke="#0F6E56" stroke-width="11" stroke-linejoin="round"/>
+  <polygon points="250,44 441,153 441,367 250,476 59,367 59,153"
+    fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-linejoin="round" opacity="0.55"/>
+
+  <!-- Package name -->
+  <text font-family="monospace" font-weight="700" font-size="27"
+    fill="#80CBC4" text-anchor="middle" x="250" y="545" letter-spacing="1">tivis.r</text>
+</svg>
