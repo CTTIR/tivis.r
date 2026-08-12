@@ -76,10 +76,10 @@
 <code><a href="../reference/tivis_measurement.html">tivis_measurement()</a></code> bundles cube, wavelengths, metadata, references and timestamp for a single capture.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="known-limitation-spatial-layout-0-1-0">Known limitation: spatial layout<a class="anchor" aria-label="anchor" href="#known-limitation-spatial-layout-0-1-0"></a></h3>
-<p>The container is undocumented by the vendor. The header, sample type (big-endian <code>float32</code>) and wavelength axis (500–995 nm in 5 nm steps) are settled. <strong>The ordering of samples within a band is not.</strong></p>
-<p><code><a href="../reference/tivis_read_cube.html">tivis_read_cube()</a></code> currently assumes band-interleaved-by-pixel ordering, which produces band images tiled four times horizontally and heavily striped. Do not use the returned images for analysis until this is resolved.</p>
-<p>An earlier draft of this file claimed the layout had been validated against the vendor’s RGB exports at <code>r = 0.86</code>. That measurement was taken on downsampled images, and the reference is dominated by horizontal structure that survives horizontal tiling, so a wrong layout scored well. At full resolution — and on visual inspection — it is clearly incorrect.</p>
+<h3 id="format-notes-0-1-0">Format notes<a class="anchor" aria-label="anchor" href="#format-notes-0-1-0"></a></h3>
+<p>The container is undocumented by the vendor. The layout implemented here — big-endian <code>float32</code>, band-interleaved-by-pixel, pixels <strong>column-major</strong> with y varying fastest, behind three big-endian <code>uint32</code> dimensions, on a 500–995 nm axis in 5 nm steps — was established by measuring the sample stream’s own periodicity.</p>
+<p>Autocorrelation of the raw stream peaks at lag 100 (r = 0.95), the band count, with harmonics at 200/300/400: band interleaving by pixel. Autocorrelation of an extracted band plane peaks at lag 480 (r = 0.99), the image height, versus r = 0.43 at lag 640, the width: pixels run down columns.</p>
+<p>During development this was briefly documented as row-major on the strength of a correlation against the Suite’s RGB export. That was incorrect — the comparison was made on downsampled images, where the tiling artefact it should have exposed was averaged away. The vendor PNG is rotated and rescaled relative to the cube and is not usable as pixel-level ground truth.</p>
 </div>
 </div>
   </div>

@@ -83,9 +83,6 @@
 <p><a href="https://doi.org/10.5281/zenodo.21889970" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21889970.svg" alt="DOI"></a></p>
 <!-- badges: start -->
 
-<blockquote>
-<p>[!WARNING] <strong>The spatial layout is not yet correct.</strong> <code><a href="reference/tivis_read_cube.html">tivis_read_cube()</a></code> currently returns band images that are tiled horizontally and striped — the header, sample type and wavelength axis are settled, but the ordering of samples within a band is not. Do not use the returned images for analysis yet. See <a href="#the-file-format">The file format</a>.</p>
-</blockquote>
 <p>Read hyperspectral recordings written by the <strong>Diaspective Vision TIVITA Suite</strong>, used for intraoperative tissue and perfusion imaging.</p>
 <p><code>tivis.r</code> is the TIVITA counterpart to <a href="https://github.com/CTTIR/cuvis.r" class="external-link"><code>cuvis.r</code></a>, which covers Cubert snapshot cameras. The important practical difference: the TIVITA container is a plain binary format, so <strong>this package needs no vendor SDK and contains no compiled code</strong> — nothing to install beyond R itself.</p>
 <p>Both packages feed <a href="https://github.com/CTTIR/hyperspectR" class="external-link"><code>hyperspectR</code></a>, which owns the <code>hsi_cube</code> class and the analysis pipeline.</p>
@@ -125,9 +122,13 @@
 <div class="section level2">
 <h2 id="the-file-format">The file format<a class="anchor" aria-label="anchor" href="#the-file-format"></a>
 </h2>
-<p>TIVITA does not publish a specification, so the format is being determined empirically. Part of it is settled; part is not.</p>
-<p><strong>Settled:</strong></p>
-<table class="table"><tbody>
+<p>TIVITA does not publish a specification, so the format was determined empirically:</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<tbody>
 <tr>
 <td>Header</td>
 <td>12 bytes: three big-endian <code>uint32</code> — width, height, bands</td>
@@ -138,6 +139,15 @@
 </td>
 </tr>
 <tr>
+<td>Band order</td>
+<td>band-interleaved-by-pixel (all bands of a pixel contiguous)</td>
+</tr>
+<tr>
+<td>Pixel order</td>
+<td>
+<strong>column-major</strong> — y varies fastest</td>
+</tr>
+<tr>
 <td>Wavelengths</td>
 <td>500–995 nm in 5 nm steps (100 bands)</td>
 </tr>
@@ -146,11 +156,17 @@
 <td>calibrated reflectance; may fall slightly outside <code>[0, 1]</code>
 </td>
 </tr>
-</tbody></table>
-<p>The header decodes to <code>640, 480, 100</code> and the file size equals <code>12 + 640 × 480 × 100 × 4</code> exactly. Big-endian <code>float32</code> yields physically plausible reflectance with no non-finite values, where little-endian yields thousands of <code>NaN</code>. The wavelength axis is corroborated independently.</p>
-<p><strong>Not settled — the sample ordering within a band.</strong> Reading the samples band-interleaved-by-pixel produces an image that is <em>tiled four times horizontally and heavily striped</em>, so it is wrong. Band-sequential and band-interleaved-by-line orderings are worse. De-interleaving columns in four groups removes the tiling and yields a continuous image, but that image still does not match the Suite’s own <code>_RGB-Image.png</code> for the same capture, so it is not right either.</p>
-<p>A caution about how this was previously assessed: an earlier version of this README claimed the layout was validated at <code>r = 0.86</code> against the vendor RGB export. That figure was obtained by correlating <strong>downsampled</strong> images, and the reference happens to be dominated by horizontal structure that survives horizontal tiling — so a visibly tiled image still scored highly. Scored at full resolution, and simply <em>looked at</em>, the layout is plainly wrong. The lesson is that a summary statistic was trusted where an image should have been inspected.</p>
-<p>Getting this wrong is easy to miss: <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code> recycles silently, so a reader with the wrong ordering still returns a full-size, plausible-looking cube. <code><a href="reference/tivis_read_header.html">tivis_read_header()</a></code> therefore validates the file size against the header, and the test suite round-trips a cube whose every sample is uniquely identifiable — that round-trip passes, because it tests the writer and reader against each other rather than against reality.</p>
+</tbody>
+</table>
+<p>The header decodes to <code>640, 480, 100</code> and the file size equals <code>12 + 640 × 480 × 100 × 4</code> exactly. Big-endian <code>float32</code> gives physically plausible reflectance with no non-finite values; little-endian gives thousands of <code>NaN</code>.</p>
+<p>The two ordering questions were settled by measuring the sample stream directly rather than guessing. Autocorrelation of the raw stream peaks at <strong>lag 100 (r = 0.95)</strong> — the band count — with harmonics at 200, 300 and 400, which is the signature of band interleaving by pixel. Autocorrelation of a single extracted band plane then peaks at <strong>lag 480 (r = 0.99)</strong>, the image <em>height</em>, against r = 0.43 at lag 640, the width: pixels run down columns, not across rows. Rendering with that ordering produces a sharp clinical image; every other combination produces tiling, striping or noise.</p>
+<div class="section level3">
+<h3 id="a-note-on-validating-this">A note on validating this<a class="anchor" aria-label="anchor" href="#a-note-on-validating-this"></a>
+</h3>
+<p>An earlier version of this README claimed the layout was validated at <code>r = 0.86</code> against the Suite’s <code>_RGB-Image.png</code>. That was wrong, and worth recording. The figure came from correlating <strong>downsampled</strong> images, and the reference is dominated by horizontal structure that survives horizontal tiling — so an image tiled four times across still scored 0.86.</p>
+<p>The vendor PNG turned out to be unusable as ground truth anyway: it is rendered at a different size, carries a title bar, and is rotated relative to the cube, so even the <em>correct</em> layout correlates with it at roughly zero. The thing that actually settled the format was looking at the image, and then measuring the sample stream’s own periodicity — no reference required.</p>
+<p>Getting this wrong is easy to miss, because <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code> recycles silently: a reader with the wrong ordering still returns a full-size, plausible-looking cube. <code><a href="reference/tivis_read_header.html">tivis_read_header()</a></code> therefore validates the file size against the header, and the tests pin the x/y mapping with an asymmetric feature rather than only round-tripping the writer against the reader — which is what let the earlier error pass a green suite.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="related-packages">Related packages<a class="anchor" aria-label="anchor" href="#related-packages"></a>
