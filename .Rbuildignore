@@ -13,3 +13,5 @@
 ^\.Rproj\.user$
 ^.*\.Rproj$
 ^LICENSE\.mine$
+^CITATION\.cff$
+^\.zenodo\.json$
