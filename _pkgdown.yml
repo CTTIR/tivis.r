@@ -1,0 +1,51 @@
+url: https://cttir.github.io/tivis.r/
+
+template:
+  package: themakR
+
+development:
+  mode: auto
+
+home:
+  title: tivis.r
+  description: >
+    Pure-R reader for Diaspective Vision TIVITA hyperspectral recordings.
+    No vendor SDK, no compiled code.
+
+reference:
+  - title: Reading
+    desc: >
+      Parse the binary SpecCube container. Headers are cheap to read, so an
+      archive can be surveyed without touching the samples.
+    contents:
+      - tivis_read_cube
+      - tivis_read_header
+      - tivis_get_wavelengths
+
+  - title: Recordings
+    desc: >
+      A TIVITA capture is a directory: the cube, an acquisition log, and the
+      parameter images the Suite exported alongside it.
+    contents:
+      - tivis_measurement
+      - tivis_list_measurements
+      - tivis_get_metadata
+      - tivis_reference_images
+      - tivis_parse_timestamp
+
+  - title: Package
+    contents:
+      - tivis_available
+      - tivis_example_file
+      - tivis.r-package
+
+articles:
+  - title: Getting started
+    navbar: ~
+    contents:
+      - tivis
+
+# navbar, footer and the home sidebar are inherited from themakR via
+# `template: package: themakR`. Do NOT re-declare `navbar:` here -- overriding
+# its structure drops the `lightswitch` component and disables the dark/light
+# toggle.
