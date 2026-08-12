@@ -3,4 +3,7 @@ pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   tivis: tivis.html
-last_built: 2026-08-12T06:21Z
+last_built: 2026-08-12T10:26Z
+urls:
+  reference: https://cttir.github.io/tivis.r/reference
+  article: https://cttir.github.io/tivis.r/articles
