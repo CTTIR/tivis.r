@@ -30,7 +30,7 @@ for (b in seq_len(bands)) {
 
 ## Serialise: 12-byte big-endian uint32 header (width, height, bands),
 ## then big-endian float32 samples band-interleaved-by-pixel, pixels
-## row-major with x varying fastest.
+## column-major with y varying fastest (the real TIVITA ordering).
 out <- file.path("inst", "extdata", "example_SpecCube.dat")
 dir.create(dirname(out), recursive = TRUE, showWarnings = FALSE)
 
@@ -39,8 +39,8 @@ writeBin(as.integer(c(width, height, bands)), con, size = 4L, endian = "big")
 
 interleaved <- numeric(width * height * bands)
 i <- 1L
-for (y in seq_len(height)) {
-  for (x in seq_len(width)) {
+for (x in seq_len(width)) {
+  for (y in seq_len(height)) {
     interleaved[i:(i + bands - 1L)] <- cube[y, x, ]
     i <- i + bands
   }

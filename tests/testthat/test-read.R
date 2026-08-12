@@ -57,9 +57,10 @@ test_that("the BIP layout round-trips a known cube", {
   on.exit(unlink(tmp), add = TRUE)
   con <- file(tmp, "wb")
   writeBin(as.integer(c(w, h, nb)), con, size = 4L, endian = "big")
+  # pixels are stored column-major: y varies fastest
   flat <- numeric(w * h * nb)
   i <- 1L
-  for (y in seq_len(h)) for (x in seq_len(w)) {
+  for (x in seq_len(w)) for (y in seq_len(h)) {
     flat[i:(i + nb - 1L)] <- truth[y, x, ]
     i <- i + nb
   }
@@ -67,6 +68,61 @@ test_that("the BIP layout round-trips a known cube", {
   close(con)
 
   expect_equal(tivis_read_cube(tmp), truth, ignore_attr = TRUE)
+})
+
+test_that("a single bright pixel lands at the coordinate it was written to", {
+  # This pins the x/y mapping against an asymmetric, hand-placed feature.
+  # The round-trip test above cannot catch a transposed or tiled reader,
+  # because it checks the writer against the reader; both were wrong together
+  # in an earlier version, and the suite stayed green while band images came
+  # out tiled four times across.
+  w <- 7L; h <- 5L; nb <- 3L
+  target_y <- 2L; target_x <- 6L
+
+  tmp <- tempfile(fileext = "_SpecCube.dat")
+  on.exit(unlink(tmp), add = TRUE)
+  con <- file(tmp, "wb")
+  writeBin(as.integer(c(w, h, nb)), con, size = 4L, endian = "big")
+  flat <- numeric(w * h * nb)
+  i <- 1L
+  for (x in seq_len(w)) for (y in seq_len(h)) {
+    flat[i:(i + nb - 1L)] <- if (y == target_y && x == target_x) 1 else 0
+    i <- i + nb
+  }
+  writeBin(flat, con, size = 4L, endian = "big")
+  close(con)
+
+  cube <- tivis_read_cube(tmp)
+  expect_equal(dim(cube), c(h, w, nb))
+  expect_equal(cube[target_y, target_x, 1], 1)
+  expect_equal(sum(cube[, , 1]), 1)          # nothing smeared elsewhere
+  expect_equal(which(cube[, , 1] == 1, arr.ind = TRUE)[1, ],
+               c(row = target_y, col = target_x))
+})
+
+test_that("an asymmetric ramp is not transposed", {
+  # Complements the single-pixel test: a gradient that differs along x and y
+  # pins the orientation even if a future change preserves point positions.
+  w <- 9L; h <- 4L; nb <- 2L
+  truth <- array(0, dim = c(h, w, nb))
+  for (y in seq_len(h)) for (x in seq_len(w)) truth[y, x, ] <- 10 * y + x
+
+  tmp <- tempfile(fileext = "_SpecCube.dat")
+  on.exit(unlink(tmp), add = TRUE)
+  con <- file(tmp, "wb")
+  writeBin(as.integer(c(w, h, nb)), con, size = 4L, endian = "big")
+  flat <- numeric(w * h * nb); i <- 1L
+  for (x in seq_len(w)) for (y in seq_len(h)) {
+    flat[i:(i + nb - 1L)] <- truth[y, x, ]; i <- i + nb
+  }
+  writeBin(flat, con, size = 4L, endian = "big")
+  close(con)
+
+  got <- tivis_read_cube(tmp)[, , 1]
+  expect_equal(got, truth[, , 1], ignore_attr = TRUE)
+  # rows must increase by 10, columns by 1 -- not the other way round
+  expect_equal(unname(got[2, 1] - got[1, 1]), 10)
+  expect_equal(unname(got[1, 2] - got[1, 1]), 1)
 })
 
 test_that("malformed files are rejected with a useful message", {

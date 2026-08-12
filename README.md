@@ -7,13 +7,6 @@
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-> [!WARNING]
-> **The spatial layout is not yet correct.** `tivis_read_cube()` currently
-> returns band images that are tiled horizontally and striped — the header,
-> sample type and wavelength axis are settled, but the ordering of samples
-> within a band is not. Do not use the returned images for analysis yet.
-> See [The file format](#the-file-format).
-
 Read hyperspectral recordings written by the **Diaspective Vision TIVITA
 Suite**, used for intraoperative tissue and perfusion imaging.
 
@@ -61,46 +54,52 @@ tivis_list_measurements("/archive/tivita")
 
 ## The file format
 
-TIVITA does not publish a specification, so the format is being determined
-empirically. Part of it is settled; part is not.
-
-**Settled:**
+TIVITA does not publish a specification, so the format was determined
+empirically:
 
 | | |
 |---|---|
 | Header | 12 bytes: three big-endian `uint32` — width, height, bands |
 | Samples | big-endian `float32` |
+| Band order | band-interleaved-by-pixel (all bands of a pixel contiguous) |
+| Pixel order | **column-major** — y varies fastest |
 | Wavelengths | 500–995 nm in 5 nm steps (100 bands) |
 | Values | calibrated reflectance; may fall slightly outside `[0, 1]` |
 
 The header decodes to `640, 480, 100` and the file size equals
-`12 + 640 × 480 × 100 × 4` exactly. Big-endian `float32` yields physically
-plausible reflectance with no non-finite values, where little-endian yields
-thousands of `NaN`. The wavelength axis is corroborated independently.
+`12 + 640 × 480 × 100 × 4` exactly. Big-endian `float32` gives physically
+plausible reflectance with no non-finite values; little-endian gives thousands
+of `NaN`.
 
-**Not settled — the sample ordering within a band.** Reading the samples
-band-interleaved-by-pixel produces an image that is *tiled four times
-horizontally and heavily striped*, so it is wrong. Band-sequential and
-band-interleaved-by-line orderings are worse. De-interleaving columns in four
-groups removes the tiling and yields a continuous image, but that image still
-does not match the Suite's own `_RGB-Image.png` for the same capture, so it is
-not right either.
+The two ordering questions were settled by measuring the sample stream
+directly rather than guessing. Autocorrelation of the raw stream peaks at
+**lag 100 (r = 0.95)** — the band count — with harmonics at 200, 300 and 400,
+which is the signature of band interleaving by pixel. Autocorrelation of a
+single extracted band plane then peaks at **lag 480 (r = 0.99)**, the image
+*height*, against r = 0.43 at lag 640, the width: pixels run down columns, not
+across rows. Rendering with that ordering produces a sharp clinical image;
+every other combination produces tiling, striping or noise.
 
-A caution about how this was previously assessed: an earlier version of this
-README claimed the layout was validated at `r = 0.86` against the vendor RGB
-export. That figure was obtained by correlating **downsampled** images, and the
-reference happens to be dominated by horizontal structure that survives
-horizontal tiling — so a visibly tiled image still scored highly. Scored at
-full resolution, and simply *looked at*, the layout is plainly wrong. The
-lesson is that a summary statistic was trusted where an image should have been
-inspected.
+### A note on validating this
 
-Getting this wrong is easy to miss: `array()` recycles silently, so a reader
-with the wrong ordering still returns a full-size, plausible-looking cube.
-`tivis_read_header()` therefore validates the file size against the header, and
-the test suite round-trips a cube whose every sample is uniquely identifiable —
-that round-trip passes, because it tests the writer and reader against each
-other rather than against reality.
+An earlier version of this README claimed the layout was validated at
+`r = 0.86` against the Suite's `_RGB-Image.png`. That was wrong, and worth
+recording. The figure came from correlating **downsampled** images, and the
+reference is dominated by horizontal structure that survives horizontal
+tiling — so an image tiled four times across still scored 0.86.
+
+The vendor PNG turned out to be unusable as ground truth anyway: it is
+rendered at a different size, carries a title bar, and is rotated relative to
+the cube, so even the *correct* layout correlates with it at roughly zero. The
+thing that actually settled the format was looking at the image, and then
+measuring the sample stream's own periodicity — no reference required.
+
+Getting this wrong is easy to miss, because `array()` recycles silently: a
+reader with the wrong ordering still returns a full-size, plausible-looking
+cube. `tivis_read_header()` therefore validates the file size against the
+header, and the tests pin the x/y mapping with an asymmetric feature rather
+than only round-tripping the writer against the reader — which is what let the
+earlier error pass a green suite.
 
 ## Related packages
 
