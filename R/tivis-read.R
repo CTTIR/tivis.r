@@ -12,7 +12,9 @@
 #'   `width`, `height` and `bands`;
 #' * followed by **big-endian** `float32` samples;
 #' * stored **band-interleaved-by-pixel** (BIP): all bands of one pixel are
-#'   contiguous, pixels run in row-major order (x varies fastest).
+#'   contiguous; this reader implements column-major spatial planes
+#'   (y varies fastest).
+#'   Device/export qualification requires an independent geometry fixture.
 #'
 #' Values are calibrated reflectance. They are normally within `[0, 1]` but may
 #' fall slightly below zero or exceed one in specular and saturated regions, so
@@ -205,4 +207,37 @@ tivis_example_file <- function() {
     ))
   }
   bands
+}
+
+#' Read with explicit spectral evidence
+#' @param path Cube path.
+#' @param wavelengths Explicit full wavelength vector, or NULL for unavailable.
+#' @param bands Optional source band indices.
+#' @return Native cube with explicit wavelength availability; no wavelength
+#' inference is retained in this additive reader.
+#' @export
+tivis_read_cube_profiled <- function(path, wavelengths = NULL, bands = NULL) {
+  hdr <- tivis_read_header(path)
+  if (!is.null(wavelengths) &&
+        (!is.numeric(wavelengths) || length(wavelengths) != hdr$bands ||
+           any(!is.finite(wavelengths)))) {
+    cli::cli_abort("Explicit wavelengths must match source bands.")
+  }
+  keep <- if (is.null(bands)) {
+    seq_len(hdr$bands)
+  } else {
+    .check_bands(bands, hdr$bands)
+  }
+  out <- tivis_read_cube(path, bands = keep)
+  attr(out, "wavelengths") <- if (is.null(wavelengths)) {
+    rep(NA_real_, length(keep))
+  } else {
+    wavelengths[keep]
+  }
+  attr(out, "wavelength_evidence") <- if (is.null(wavelengths)) {
+    "unavailable"
+  } else {
+    "caller_declared"
+  }
+  out
 }
