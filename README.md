@@ -33,18 +33,18 @@ remotes::install_github("CTTIR/tivis.r")
 library(tivis.r)
 
 # Inspect a recording's geometry without reading 123 MB of samples
-tivis_read_header("2019_11_25_13_29_24_SpecCube.dat")
+tivis_read_header("2000_01_01_12_00_00_SpecCube.dat")
 #> $width  [1] 640
 #> $height [1] 480
 #> $bands  [1] 100
 
 # Read the cube: (rows, cols, bands), with wavelengths attached
-cube <- tivis_read_cube("2019_11_25_13_29_24_SpecCube.dat")
+cube <- tivis_read_cube("2000_01_01_12_00_00_SpecCube.dat")
 dim(cube)
 #> [1] 480 640 100
 
 # Everything the Suite stored for one capture
-m <- tivis_measurement("2019_11_25_13_29_24_SpecCube.dat")
+m <- tivis_measurement("2000_01_01_12_00_00_SpecCube.dat")
 m$metadata$Camera$Exposure
 names(m$references)
 #> "NIR-Perfusion" "Oxygenation" "RGB-Image" "THI" "TWI"

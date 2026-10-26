@@ -43,20 +43,20 @@ test_that("text containing a comma is not mangled into a number", {
 })
 
 test_that("timestamps parse from TIVITA filenames", {
-  ts <- tivis_parse_timestamp("2019_11_25_13_29_24_SpecCube.dat")
+  ts <- tivis_parse_timestamp("2000_01_01_12_00_00_SpecCube.dat")
   expect_s3_class(ts, "POSIXct")
-  expect_equal(format(ts, "%Y-%m-%d %H:%M:%S", tz = "UTC"), "2019-11-25 13:29:24")
+  expect_equal(format(ts, "%Y-%m-%d %H:%M:%S", tz = "UTC"), "2000-01-01 12:00:00")
   expect_true(is.na(tivis_parse_timestamp("not-a-tivita-name.dat")))
 })
 
 test_that("reference images are found and labelled", {
   dir <- withr::local_tempdir()
   for (p in c("RGB-Image", "Oxygenation", "THI")) {
-    file.create(file.path(dir, paste0("2019_11_25_13_29_24_", p, ".png")))
+    file.create(file.path(dir, paste0("2000_01_01_12_00_00_", p, ".png")))
   }
-  file.create(file.path(dir, "2019_11_25_13_29_24_SpecCube.dat"))
+  file.create(file.path(dir, "2000_01_01_12_00_00_SpecCube.dat"))
 
-  refs <- tivis_reference_images(file.path(dir, "2019_11_25_13_29_24_SpecCube.dat"))
+  refs <- tivis_reference_images(file.path(dir, "2000_01_01_12_00_00_SpecCube.dat"))
   expect_setequal(names(refs), c("RGB-Image", "Oxygenation", "THI"))
   expect_true(all(file.exists(refs)))
 })

@@ -95,7 +95,7 @@ tivis_get_metadata <- function(path) {
 #'
 #' @examples
 #' \donttest{
-#' # tivis_reference_images("/path/to/2019_11_25_13_29_24_SpecCube.dat")
+#' # tivis_reference_images("/path/to/2000_01_01_12_00_00_SpecCube.dat")
 #' }
 #'
 #' @export
