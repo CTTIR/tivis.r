@@ -35,7 +35,9 @@ against the TIVITA Suite's own \verb{_RGB-Image.png} exports:
 \code{width}, \code{height} and \code{bands};
 \item followed by \strong{big-endian} \code{float32} samples;
 \item stored \strong{band-interleaved-by-pixel} (BIP): all bands of one pixel are
-contiguous, pixels run in row-major order (x varies fastest).
+contiguous; this reader implements column-major spatial planes
+(y varies fastest).
+Device/export qualification requires an independent geometry fixture.
 }
 
 Values are calibrated reflectance. They are normally within \verb{[0, 1]} but may
