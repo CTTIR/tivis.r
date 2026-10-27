@@ -73,7 +73,7 @@ tivis_list_measurements <- function(root, recursive = TRUE) {
 #' @return A `POSIXct` vector, `NA` where no timestamp is present.
 #'
 #' @examples
-#' tivis_parse_timestamp("2019_11_25_13_29_24_SpecCube.dat")
+#' tivis_parse_timestamp("2000_01_01_12_00_00_SpecCube.dat")
 #'
 #' @export
 tivis_parse_timestamp <- function(x) {

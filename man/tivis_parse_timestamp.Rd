@@ -17,6 +17,6 @@ TIVITA names every artefact of a recording \verb{YYYY_MM_DD_HH_MM_SS_<what>}.
 This extracts the acquisition time from such a name.
 }
 \examples{
-tivis_parse_timestamp("2019_11_25_13_29_24_SpecCube.dat")
+tivis_parse_timestamp("2000_01_01_12_00_00_SpecCube.dat")
 
 }
