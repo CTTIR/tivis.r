@@ -98,7 +98,9 @@ against the TIVITA Suite's own <code>_RGB-Image.png</code> exports:</p><ul><li><
 <code>width</code>, <code>height</code> and <code>bands</code>;</p></li>
 <li><p>followed by <strong>big-endian</strong> <code>float32</code> samples;</p></li>
 <li><p>stored <strong>band-interleaved-by-pixel</strong> (BIP): all bands of one pixel are
-contiguous, pixels run in row-major order (x varies fastest).</p></li>
+contiguous; this reader implements column-major spatial planes
+(y varies fastest).
+Device/export qualification requires an independent geometry fixture.</p></li>
 </ul><p>Values are calibrated reflectance. They are normally within <code>[0, 1]</code> but may
 fall slightly below zero or exceed one in specular and saturated regions, so
 the reader does not clamp them.</p>

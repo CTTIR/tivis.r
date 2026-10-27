@@ -7,6 +7,8 @@ archive can be surveyed without touching the samples.
 
 - [`tivis_read_cube()`](https://cttir.github.io/tivis.r/reference/tivis_read_cube.md)
   : Read a TIVITA Suite Hyperspectral Cube
+- [`tivis_read_cube_profiled()`](https://cttir.github.io/tivis.r/reference/tivis_read_cube_profiled.md)
+  : Read with explicit spectral evidence
 - [`tivis_read_header()`](https://cttir.github.io/tivis.r/reference/tivis_read_header.md)
   : Read a TIVITA Cube Header
 - [`tivis_get_wavelengths()`](https://cttir.github.io/tivis.r/reference/tivis_get_wavelengths.md)

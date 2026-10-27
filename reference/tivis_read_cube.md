@@ -45,7 +45,9 @@ validated against the TIVITA Suite's own `_RGB-Image.png` exports:
 - followed by **big-endian** `float32` samples;
 
 - stored **band-interleaved-by-pixel** (BIP): all bands of one pixel are
-  contiguous, pixels run in row-major order (x varies fastest).
+  contiguous; this reader implements column-major spatial planes (y
+  varies fastest). Device/export qualification requires an independent
+  geometry fixture.
 
 Values are calibrated reflectance. They are normally within `[0, 1]` but
 may fall slightly below zero or exceed one in specular and saturated

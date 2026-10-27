@@ -17,6 +17,7 @@
 <url><loc>https://cttir.github.io/tivis.r/reference/tivis_measurement.html</loc></url>
 <url><loc>https://cttir.github.io/tivis.r/reference/tivis_parse_timestamp.html</loc></url>
 <url><loc>https://cttir.github.io/tivis.r/reference/tivis_read_cube.html</loc></url>
+<url><loc>https://cttir.github.io/tivis.r/reference/tivis_read_cube_profiled.html</loc></url>
 <url><loc>https://cttir.github.io/tivis.r/reference/tivis_read_header.html</loc></url>
 <url><loc>https://cttir.github.io/tivis.r/reference/tivis_reference_images.html</loc></url>
 </urlset>
