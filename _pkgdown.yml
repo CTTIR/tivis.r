@@ -19,6 +19,7 @@ reference:
       archive can be surveyed without touching the samples.
     contents:
       - tivis_read_cube
+      - tivis_read_cube_profiled
       - tivis_read_header
       - tivis_get_wavelengths
 
