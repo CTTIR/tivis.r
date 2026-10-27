@@ -102,18 +102,18 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cttir/tivis.r" class="external-link">tivis.r</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Inspect a recording's geometry without reading 123 MB of samples</span></span>
-<span><span class="fu"><a href="reference/tivis_read_header.html">tivis_read_header</a></span><span class="op">(</span><span class="st">"2019_11_25_13_29_24_SpecCube.dat"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/tivis_read_header.html">tivis_read_header</a></span><span class="op">(</span><span class="st">"2000_01_01_12_00_00_SpecCube.dat"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $width  [1] 640</span></span>
 <span><span class="co">#&gt; $height [1] 480</span></span>
 <span><span class="co">#&gt; $bands  [1] 100</span></span>
 <span></span>
 <span><span class="co"># Read the cube: (rows, cols, bands), with wavelengths attached</span></span>
-<span><span class="va">cube</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tivis_read_cube.html">tivis_read_cube</a></span><span class="op">(</span><span class="st">"2019_11_25_13_29_24_SpecCube.dat"</span><span class="op">)</span></span>
+<span><span class="va">cube</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tivis_read_cube.html">tivis_read_cube</a></span><span class="op">(</span><span class="st">"2000_01_01_12_00_00_SpecCube.dat"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">cube</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 480 640 100</span></span>
 <span></span>
 <span><span class="co"># Everything the Suite stored for one capture</span></span>
-<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tivis_measurement.html">tivis_measurement</a></span><span class="op">(</span><span class="st">"2019_11_25_13_29_24_SpecCube.dat"</span><span class="op">)</span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tivis_measurement.html">tivis_measurement</a></span><span class="op">(</span><span class="st">"2000_01_01_12_00_00_SpecCube.dat"</span><span class="op">)</span></span>
 <span><span class="va">m</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Camera</span><span class="op">$</span><span class="va">Exposure</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">references</span><span class="op">)</span></span>
 <span><span class="co">#&gt; "NIR-Perfusion" "Oxygenation" "RGB-Image" "THI" "TWI"</span></span>

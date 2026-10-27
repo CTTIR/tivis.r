@@ -22,6 +22,6 @@ A `POSIXct` vector, `NA` where no timestamp is present.
 ## Examples
 
 ``` r
-tivis_parse_timestamp("2019_11_25_13_29_24_SpecCube.dat")
-#> [1] "2019-11-25 13:29:24 UTC"
+tivis_parse_timestamp("2000_01_01_12_00_00_SpecCube.dat")
+#> [1] "2000-01-01 12:00:00 UTC"
 ```
