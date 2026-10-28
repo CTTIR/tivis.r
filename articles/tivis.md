@@ -1,5 +1,7 @@
 # Reading TIVITA recordings with tivis.r
 
+![tivis.r logo](figures/logo.svg)![tivis.r logo](figures/logo-dark.svg)
+
 The Diaspective Vision TIVITA Suite writes each capture as a directory
 containing a binary `*_SpecCube.dat` cube, a `*_meta.log` acquisition
 record, and a set of PNG parameter maps the Suite computed itself.
