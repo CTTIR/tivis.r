@@ -17,3 +17,4 @@
 ^\.zenodo\.json$
 ^tivis\.r_icon\.svg$
 ^tools/branding$
+^\.git$
