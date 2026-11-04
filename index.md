@@ -1,7 +1,5 @@
 # tivis.r ![tivis.r logo](reference/figures/logo-with-name.png)
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21889970.svg)](https://doi.org/10.5281/zenodo.21889970)
-
 Read hyperspectral recordings written by the **Diaspective Vision TIVITA
 Suite**, used for intraoperative tissue and perfusion imaging.
 
@@ -124,9 +122,7 @@ If you use this software, please cite it as:
 
 > Heller, R. (2026). *tivis.r: Reading Diaspective Vision TIVITA
 > hyperspectral recordings* (Version 0.1.0) \[Computer software\].
-> Zenodo. <https://doi.org/10.5281/zenodo.21889970>
-
-DOI: [10.5281/zenodo.21889970](https://doi.org/10.5281/zenodo.21889970)
+> <https://github.com/CTTIR/tivis.r>
 
 ## Use of LLM tools
 
