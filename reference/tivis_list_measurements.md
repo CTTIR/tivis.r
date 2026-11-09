@@ -28,7 +28,17 @@ rows if nothing matches.
 ## Examples
 
 ``` r
-# \donttest{
-# tivis_list_measurements("/archive/tivita")
-# }
+# Build a tiny archive in a temporary directory from the bundled example
+archive <- file.path(tempdir(), "tivita-archive")
+dir.create(archive, showWarnings = FALSE)
+invisible(file.copy(tivis_example_file(),
+                    file.path(archive, "2000_01_01_12_00_00_SpecCube.dat")))
+tivis_list_measurements(archive)
+#>                                                              path
+#> 1 /tmp/Rtmpjg55Mj/tivita-archive/2000_01_01_12_00_00_SpecCube.dat
+#>                              dir           timestamp width height bands
+#> 1 /tmp/Rtmpjg55Mj/tivita-archive 2000-01-01 12:00:00    16     12     8
+#>   file_size n_reference_images
+#> 1      6156                  0
+unlink(archive, recursive = TRUE)
 ```

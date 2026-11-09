@@ -11,13 +11,13 @@ Source:
 [`DESCRIPTION`](https://github.com/cttir/tivis.r/blob/main/DESCRIPTION)
 
 Heller R (2026). *tivis.r: Read Diaspective Vision TIVITA Hyperspectral
-Recordings*. R package version 0.1.0,
+Recordings*. R package version 0.2.0,
 <https://github.com/cttir/tivis.r>.
 
     @Manual{,
       title = {tivis.r: Read Diaspective Vision TIVITA Hyperspectral Recordings},
       author = {R. Heller},
       year = {2026},
-      note = {R package version 0.1.0},
+      note = {R package version 0.2.0},
       url = {https://github.com/cttir/tivis.r},
     }

@@ -121,7 +121,7 @@ MIT
 If you use this software, please cite it as:
 
 > Heller, R. (2026). *tivis.r: Reading Diaspective Vision TIVITA
-> hyperspectral recordings* (Version 0.1.0) \[Computer software\].
+> hyperspectral recordings* (Version 0.2.0) \[Computer software\].
 > <https://github.com/CTTIR/tivis.r>
 
 ## Use of LLM tools

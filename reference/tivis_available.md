@@ -11,7 +11,7 @@ tivis_available()
 
 ## Value
 
-`TRUE`, invisibly usable in conditionals.
+Always `TRUE` (a single logical value), for use in conditionals.
 
 ## Examples
 

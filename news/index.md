@@ -1,5 +1,21 @@
 # Changelog
 
+## tivis.r 0.2.0
+
+- Prepare the package for CRAN: runnable examples for
+  [`tivis_list_measurements()`](https://cttir.github.io/tivis.r/reference/tivis_list_measurements.md)
+  and
+  [`tivis_reference_images()`](https://cttir.github.io/tivis.r/reference/tivis_reference_images.md)
+  that work in a temporary directory, full documentation and examples
+  for
+  [`tivis_read_cube_profiled()`](https://cttir.github.io/tivis.r/reference/tivis_read_cube_profiled.md),
+  and a corrected `\value` for
+  [`tivis_available()`](https://cttir.github.io/tivis.r/reference/tivis_available.md).
+- Update the maintainer e-mail address to <raban.heller@uni-ulm.de>.
+- Declare `Language: en-GB` to match the British spelling used
+  throughout and add an `inst/WORDLIST` for the spell check.
+- Add `cran-comments.md`.
+
 ## tivis.r 0.1.0
 
 - Standardize the named v5 package logo across README, documentation
