@@ -21,8 +21,12 @@ Walks a directory tree and returns one row per recording found. Only headers
 are read, so scanning a large archive is cheap.
 }
 \examples{
-\donttest{
-# tivis_list_measurements("/archive/tivita")
-}
+# Build a tiny archive in a temporary directory from the bundled example
+archive <- file.path(tempdir(), "tivita-archive")
+dir.create(archive, showWarnings = FALSE)
+invisible(file.copy(tivis_example_file(),
+                    file.path(archive, "2000_01_01_12_00_00_SpecCube.dat")))
+tivis_list_measurements(archive)
+unlink(archive, recursive = TRUE)
 
 }

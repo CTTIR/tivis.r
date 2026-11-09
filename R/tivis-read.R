@@ -163,7 +163,7 @@ tivis_get_wavelengths <- function(n_bands = 100L) {
 #' Present for symmetry with `cuvis.r::cuvis_available()`. TIVITA support is
 #' pure R with no vendor SDK, so this is always `TRUE`.
 #'
-#' @return `TRUE`, invisibly usable in conditionals.
+#' @return Always `TRUE` (a single logical value), for use in conditionals.
 #'
 #' @examples
 #' tivis_available()
@@ -209,12 +209,30 @@ tivis_example_file <- function() {
   bands
 }
 
-#' Read with explicit spectral evidence
-#' @param path Cube path.
-#' @param wavelengths Explicit full wavelength vector, or NULL for unavailable.
-#' @param bands Optional source band indices.
-#' @return Native cube with explicit wavelength availability; no wavelength
-#' inference is retained in this additive reader.
+#' Read a TIVITA Cube with Explicit Spectral Evidence
+#'
+#' Variant of [tivis_read_cube()] that does not infer the wavelength axis.
+#' The caller either declares the wavelengths explicitly or the cube is
+#' returned with `NA` wavelengths, and the provenance is recorded in a
+#' `wavelength_evidence` attribute.
+#'
+#' @param path Path to a `*_SpecCube.dat` file.
+#' @param wavelengths Explicit numeric vector with one wavelength per source
+#'   band, or `NULL` (default) when the wavelengths are unknown.
+#' @param bands Optional integer vector of source band indices. `NULL`
+#'   (default) reads every band.
+#' @return A numeric array with dimensions `(rows, cols, bands)` carrying a
+#'   `wavelengths` attribute (`NA` when not declared) and a
+#'   `wavelength_evidence` attribute, either `"unavailable"` or
+#'   `"caller_declared"`. No wavelength inference is applied.
+#' @seealso [tivis_read_cube()]
+#' @examples
+#' f <- tivis_example_file()
+#' cube <- tivis_read_cube_profiled(f)
+#' attr(cube, "wavelength_evidence")
+#'
+#' declared <- tivis_read_cube_profiled(f, wavelengths = seq(500, 535, by = 5))
+#' attr(declared, "wavelengths")
 #' @export
 tivis_read_cube_profiled <- function(path, wavelengths = NULL, bands = NULL) {
   hdr <- tivis_read_header(path)

@@ -22,8 +22,13 @@ results and are useful as a reference when validating independently
 computed indices.
 }
 \examples{
-\donttest{
-# tivis_reference_images("/path/to/2000_01_01_12_00_00_SpecCube.dat")
-}
+# Mimic a TIVITA export directory in a temporary location
+rec <- file.path(tempdir(), "tivita-recording")
+dir.create(rec, showWarnings = FALSE)
+cube <- file.path(rec, "2000_01_01_12_00_00_SpecCube.dat")
+invisible(file.copy(tivis_example_file(), cube))
+invisible(file.create(file.path(rec, "2000_01_01_12_00_00_Oxygenation.png")))
+tivis_reference_images(cube)
+unlink(rec, recursive = TRUE)
 
 }

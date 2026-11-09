@@ -2,21 +2,39 @@
 % Please edit documentation in R/tivis-read.R
 \name{tivis_read_cube_profiled}
 \alias{tivis_read_cube_profiled}
-\title{Read with explicit spectral evidence}
+\title{Read a TIVITA Cube with Explicit Spectral Evidence}
 \usage{
 tivis_read_cube_profiled(path, wavelengths = NULL, bands = NULL)
 }
 \arguments{
-\item{path}{Cube path.}
+\item{path}{Path to a \verb{*_SpecCube.dat} file.}
 
-\item{wavelengths}{Explicit full wavelength vector, or NULL for unavailable.}
+\item{wavelengths}{Explicit numeric vector with one wavelength per source
+band, or \code{NULL} (default) when the wavelengths are unknown.}
 
-\item{bands}{Optional source band indices.}
+\item{bands}{Optional integer vector of source band indices. \code{NULL}
+(default) reads every band.}
 }
 \value{
-Native cube with explicit wavelength availability; no wavelength
-inference is retained in this additive reader.
+A numeric array with dimensions \verb{(rows, cols, bands)} carrying a
+\code{wavelengths} attribute (\code{NA} when not declared) and a
+\code{wavelength_evidence} attribute, either \code{"unavailable"} or
+\code{"caller_declared"}. No wavelength inference is applied.
 }
 \description{
-Read with explicit spectral evidence
+Variant of \code{\link[=tivis_read_cube]{tivis_read_cube()}} that does not infer the wavelength axis.
+The caller either declares the wavelengths explicitly or the cube is
+returned with \code{NA} wavelengths, and the provenance is recorded in a
+\code{wavelength_evidence} attribute.
+}
+\examples{
+f <- tivis_example_file()
+cube <- tivis_read_cube_profiled(f)
+attr(cube, "wavelength_evidence")
+
+declared <- tivis_read_cube_profiled(f, wavelengths = seq(500, 535, by = 5))
+attr(declared, "wavelengths")
+}
+\seealso{
+\code{\link[=tivis_read_cube]{tivis_read_cube()}}
 }

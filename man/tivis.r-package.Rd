@@ -6,7 +6,9 @@
 \alias{tivis.r-package}
 \title{tivis.r: Read Diaspective Vision TIVITA Hyperspectral Recordings}
 \description{
-Reads hyperspectral imaging data written by the Diaspective Vision TIVITA Suite, used for intraoperative tissue and perfusion imaging. Parses the binary 'SpecCube.dat' container (big-endian float32 samples in band-interleaved-by-pixel order behind a 12-byte dimension header), the German-language acquisition metadata log, and the parameter images the Suite exports alongside each recording (oxygenation, NIR perfusion, tissue haemoglobin and water indices). Requires no vendor SDK and contains no compiled code. Companion to 'cuvis.r', which covers Cubert snapshot cameras, and a data source for 'hyperspectR'.
+\if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
+
+Reads hyperspectral imaging data written by the Diaspective Vision 'TIVITA Suite', used for intraoperative tissue and perfusion imaging. Parses the binary 'SpecCube.dat' container (big-endian float32 samples in band-interleaved-by-pixel order behind a 12-byte dimension header), the German-language acquisition metadata log, and the parameter images the Suite exports alongside each recording (oxygenation, NIR perfusion, tissue haemoglobin and water indices). The reader requires no vendor software development kit and contains no compiled code. It is a companion to 'cuvis.r', which covers 'Cubert' snapshot cameras, and a data source for 'hyperspectR'.
 }
 \seealso{
 Useful links:
@@ -18,11 +20,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: R. Heller \email{raban.heller@charite.de} (\href{https://orcid.org/0000-0001-8006-9742}{ORCID})
+\strong{Maintainer}: R. Heller \email{raban.heller@uni-ulm.de} (\href{https://orcid.org/0000-0001-8006-9742}{ORCID})
 
 Authors:
 \itemize{
-  \item R. Heller \email{raban.heller@charite.de} (\href{https://orcid.org/0000-0001-8006-9742}{ORCID})
+  \item R. Heller \email{raban.heller@uni-ulm.de} (\href{https://orcid.org/0000-0001-8006-9742}{ORCID})
 }
 
 }

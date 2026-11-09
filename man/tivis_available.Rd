@@ -7,7 +7,7 @@
 tivis_available()
 }
 \value{
-\code{TRUE}, invisibly usable in conditionals.
+Always \code{TRUE} (a single logical value), for use in conditionals.
 }
 \description{
 Present for symmetry with \code{cuvis.r::cuvis_available()}. TIVITA support is
