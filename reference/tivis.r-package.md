@@ -8,8 +8,8 @@ the German-language acquisition metadata log, and the parameter images
 the Suite exports alongside each recording (oxygenation, NIR perfusion,
 tissue haemoglobin and water indices). The reader requires no vendor
 software development kit and contains no compiled code. It is a
-companion to 'cuvis.r', which covers 'Cubert' snapshot cameras, and a
-data source for 'hyperspectR'.
+companion to 'cuvis.r', which covers Cubert snapshot cameras, and a data
+source for 'hyperspectR'.
 
 ## See also
 
