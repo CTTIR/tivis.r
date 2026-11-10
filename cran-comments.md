@@ -9,9 +9,10 @@ examples, tests and the vignette run offline.
 
 ## Test environments
 
-* local: macOS (aarch64), R 4.6.1 — `R CMD check --as-cran --no-manual`
-  (no LaTeX installation available locally, hence `--no-manual`; the PDF
-  manual still needs to be checked, e.g. on win-builder, before submission)
+* local: macOS (aarch64), R 4.6.1 — `R CMD check --as-cran` on the built
+  tarball, including the PDF manual (built with TinyTeX, TeX Live 2026); an
+  additional local-only NOTE (the system HTML Tidy is too old to validate
+  the HTML manual) is environment-related and not listed below
 * GitHub Actions (r-lib/actions v2, `--as-cran`):
   * macOS-latest (release)
   * windows-latest (release)
