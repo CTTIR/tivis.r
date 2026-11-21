@@ -3,6 +3,7 @@ message: If you use this software, please cite it as below.
 type: software
 title: 'tivis.r: Reading Diaspective Vision TIVITA hyperspectral recordings'
 version: 0.2.0
+doi: 10.5281/zenodo.21889970
 date-released: '2026-11-10'
 authors:
 - family-names: Heller
@@ -10,3 +11,7 @@ authors:
   orcid: https://orcid.org/0000-0001-8006-9742
 repository-code: https://github.com/CTTIR/tivis.r
 license: MIT
+identifiers:
+- type: doi
+  value: 10.5281/zenodo.21889970
+  description: Zenodo DOI (reserved; resolves once the record is published)
