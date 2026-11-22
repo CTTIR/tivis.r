@@ -34,6 +34,6 @@ invisible(file.copy(tivis_example_file(), cube))
 invisible(file.create(file.path(rec, "2000_01_01_12_00_00_Oxygenation.png")))
 tivis_reference_images(cube)
 #>                                                            Oxygenation 
-#> "/tmp/RtmpHeXmqi/tivita-recording/2000_01_01_12_00_00_Oxygenation.png" 
+#> "/tmp/Rtmp5LSkOQ/tivita-recording/2000_01_01_12_00_00_Oxygenation.png" 
 unlink(rec, recursive = TRUE)
 ```
