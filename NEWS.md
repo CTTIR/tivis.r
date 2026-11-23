@@ -1,5 +1,58 @@
 # tivis.r 0.2.0
 
+## Bug fixes
+
+* `tivis_measurement()` no longer fails for a cube whose name does not end in
+  `_SpecCube.dat`. The log path was derived by substitution, so such a cube
+  was parsed as its own metadata log and the call aborted on invalid strings.
+  These cubes are now read with empty metadata.
+* `tivis_parse_timestamp()` returns `NA` for `NA` input instead of aborting
+  the whole vector, and accepts full paths: only the last path component is
+  inspected.
+* `tivis_get_metadata()` keeps values written in double quotes as strings.
+  Previously the content was coerced after the quotes were stripped, so the
+  identifier `"0012"` became `12` and the version `"2.0"` became `2`.
+  **Behaviour change:** quoted numbers and quoted `TRUE`/`FALSE` are now
+  returned as text; unquoted values are converted as before.
+* `tivis_get_metadata()` reads logs saved as UTF-8 correctly (they were decoded
+  as `latin1` a second time), returns all strings in UTF-8, ignores a
+  byte-order mark, and returns an empty list for a directory.
+* `tivis_reference_images()` returns only the images of the given recording
+  when the cube name carries a TIVITA timestamp. Recordings sharing one
+  directory used to receive each other's images, which also inflated
+  `n_reference_images` in `tivis_list_measurements()`. `.PNG` is matched
+  case-insensitively.
+* `tivis_list_measurements()` returns its empty result with the same UTC
+  `timestamp` column as a populated one.
+* `tivis_read_cube()` rejects fractional band indices such as `2.7` instead of
+  truncating them, checks `bands` before reading the samples, and with
+  `validate = FALSE` no longer asks for more samples than the file holds: a
+  corrupt header could request an arbitrarily large allocation.
+* `tivis_get_wavelengths()` rejects a fractional band count.
+* All readers check that the path argument is a single non-missing string,
+  and `tivis_read_header()` reports a directory as such.
+
+## New features
+
+* `tivis_parse_timestamp()` gains a `tz` argument (default `"UTC"`, as
+  before) to label the wall-clock time in the file name with the time zone of
+  the recording site.
+
+## Documentation
+
+* The help pages of `tivis_read_cube()` and `tivis_get_wavelengths()` and the
+  vignette no longer state that the layout and the wavelength axis were
+  validated against the Suite's RGB export. That comparison had been
+  withdrawn (see the format notes for 0.1.0 below) but was still cited. The
+  wavelength axis is now described as what it is: the nominal axis assumed by
+  the reader, not stored in the file.
+* The vignette gains a figure of the example cube and sections on
+  `tivis_read_cube_profiled()` and timestamps; the conversion rules of
+  `tivis_get_metadata()` and the time-zone handling of timestamps are
+  documented.
+
+## Packaging
+
 * Prepare the package for CRAN: runnable examples for
   `tivis_list_measurements()` and `tivis_reference_images()` that work in a
   temporary directory, full documentation and examples for
