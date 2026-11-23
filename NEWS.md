@@ -76,6 +76,8 @@
   add an `inst/WORDLIST` for the spell check.
 * Add `cran-comments.md`.
 * Drop the unused `png` package from `Suggests`.
+* The README citation, `CITATION.cff` and `.zenodo.json` name the author as
+  R. Heller.
 
 # tivis.r 0.1.0
 
