@@ -30,8 +30,7 @@ Suggests:
     withr,
     knitr,
     rmarkdown,
-    covr,
-    png
+    covr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Config/Needs/website: CTTIR/themakR
