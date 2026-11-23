@@ -92,7 +92,7 @@ The bundled example is a synthetic 16 × 12 pixel cube with eight bands: a
 disc of higher reflectance on a diagonal gradient. The colour key gives the
 scale.
 
-```{r first-look, fig.width = 8, fig.height = 3.4, dpi = 144, out.width = "100%", fig.alt = "Two panels. Left: false-colour image of band 4 (515 nm) of the bundled 16 by 12 pixel example cube, with a colour key for reflectance from about 0.15 to 0.48. A disc of high reflectance, about 0.4 to 0.48, sits in the centre of a gradient that rises from about 0.15 in the upper left to about 0.35 in the lower right. The y axis is labelled Row and runs downwards from 1 to 12. Right: mean reflectance of the disc and of the background across the eight bands from 500 to 535 nm. Both curves peak at 515 nm, the disc at about 0.39 and the background at about 0.24."}
+```{r first-look, fig.width = 8, fig.height = 3.4, dpi = 144, out.width = "100%", fig.show = "hold", fig.alt = "Two panels. Left: false-colour image of band 4 (515 nm) of the bundled 16 by 12 pixel example cube, with a colour key for reflectance from about 0.15 to 0.48. A disc of high reflectance, about 0.4 to 0.48, sits in the centre of a gradient that rises from about 0.15 in the upper left to about 0.35 in the lower right. The y axis is labelled Row and runs downwards from 1 to 12. Right: mean reflectance of the disc and of the background across the eight bands from 500 to 535 nm. Both curves peak at 515 nm, the disc at about 0.39 and the background at about 0.24."}
 wl <- attr(cube, "wavelengths")
 band <- cube[, , 4]
 disc <- band > mean(range(band))
