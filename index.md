@@ -121,7 +121,7 @@ earlier error pass a green suite.
 | [`hyperspectR`](https://github.com/CTTIR/hyperspectR) | `hsi_cube` class, preprocessing, tissue indices |
 | [`hyperspectaculR`](https://github.com/CTTIR/hyperspectaculR) | Publication-grade visualisation |
 
-## License
+## Licence
 
 MIT
 
@@ -129,7 +129,7 @@ MIT
 
 If you use this software, please cite it as:
 
-> Heller, R. (2026). *tivis.r: Reading Diaspective Vision TIVITA
+> R. Heller (2026). *tivis.r: Reading Diaspective Vision TIVITA
 > hyperspectral recordings* (Version 0.2.0) \[Computer software\].
 > <https://github.com/CTTIR/tivis.r>
 
