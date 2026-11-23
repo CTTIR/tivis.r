@@ -38,6 +38,15 @@
   before) to label the wall-clock time in the file name with the time zone of
   the recording site.
 
+## Performance
+
+* `tivis_read_cube()` reads the file in blocks of image columns instead of
+  loading every sample before rearranging them. For a synthetic cube of the
+  native size (640 x 480 x 100, 246 MB as an R array) the peak memory of a
+  full read fell from about 700 MB to about 365 MB, and that of a three-band
+  read from about 265 MB to about 60 MB, at unchanged or slightly better
+  speed. A band subset no longer holds the bands it drops.
+
 ## Documentation
 
 * The help pages of `tivis_read_cube()` and `tivis_get_wavelengths()` and the

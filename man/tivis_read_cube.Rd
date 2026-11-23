@@ -11,8 +11,8 @@ tivis_read_cube(path, bands = NULL, validate = TRUE)
 
 \item{bands}{Optional integer vector of band indices to read, in the order
 wanted. \code{NULL} (default) reads every band. Selecting a subset still reads
-the whole file, but returns only the requested bands. Fractional, missing
-and out-of-range indices are rejected.}
+through the whole file, but keeps only the requested bands in memory.
+Fractional, missing and out-of-range indices are rejected.}
 
 \item{validate}{Logical. Check that the file size matches the header before
 reading. Default \code{TRUE}; there is no good reason to disable it. With
@@ -54,6 +54,15 @@ cube and cannot serve as pixel-level ground truth (see \code{NEWS.md}).
 Values are calibrated reflectance. They are normally within \verb{[0, 1]} but may
 fall slightly below zero or exceed one in specular and saturated regions, so
 the reader does not clamp them.
+}
+
+\section{Memory}{
+
+Samples are stored as 4-byte floats and returned as 8-byte doubles, so a
+native 640 x 480 x 100 cube of 123 MB occupies about 246 MB in R. The file
+is read in blocks of image columns, so little working memory is needed
+beyond the returned array, and a band subset never holds the bands it
+drops.
 }
 
 \examples{

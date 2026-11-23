@@ -27,11 +27,18 @@
 #' fall slightly below zero or exceed one in specular and saturated regions, so
 #' the reader does not clamp them.
 #'
+#' @section Memory:
+#' Samples are stored as 4-byte floats and returned as 8-byte doubles, so a
+#' native 640 x 480 x 100 cube of 123 MB occupies about 246 MB in R. The file
+#' is read in blocks of image columns, so little working memory is needed
+#' beyond the returned array, and a band subset never holds the bands it
+#' drops.
+#'
 #' @param path Path to a `*_SpecCube.dat` file.
 #' @param bands Optional integer vector of band indices to read, in the order
 #'   wanted. `NULL` (default) reads every band. Selecting a subset still reads
-#'   the whole file, but returns only the requested bands. Fractional, missing
-#'   and out-of-range indices are rejected.
+#'   through the whole file, but keeps only the requested bands in memory.
+#'   Fractional, missing and out-of-range indices are rejected.
 #' @param validate Logical. Check that the file size matches the header before
 #'   reading. Default `TRUE`; there is no good reason to disable it. With
 #'   `FALSE`, a file longer than the header implies is read up to the size the
@@ -74,26 +81,32 @@ tivis_read_cube <- function(path, bands = NULL, validate = TRUE) {
 
   con <- file(path, "rb")
   on.exit(close(con), add = TRUE)
+  readBin(con, what = "raw", n = 12L) # skip the header
 
-  # skip the header, then read every sample
-  readBin(con, what = "raw", n = 12L)
-  v <- readBin(con, what = "double", n = n_values, size = 4L, endian = "big")
-  if (length(v) != n_values) {
-    .abort_truncated(path, n_values, length(v))
-  }
-
-  # BIP -> (rows, cols, band). Band b occupies every nb-th sample starting at b.
+  # BIP -> (rows, cols, band). The file order is band fastest, then y, then
+  # x: all bands of a pixel are contiguous, and within a plane the pixels are
+  # COLUMN-major, so successive pixels run down a column rather than across a
+  # row. Measured directly from the sample stream -- autocorrelation of an
+  # extracted plane peaks at lag 480 (the height) at r = 0.99, against
+  # r = 0.43 at lag 640 (the width). A block of whole columns is therefore a
+  # (band, y, x) array, and permuting it to (y, x, band) needs no transpose.
   #
-  # Within a plane the pixels are COLUMN-major: y varies fastest, so successive
-  # samples run down a column rather than across a row. Measured directly from
-  # the sample stream -- autocorrelation of an extracted plane peaks at lag 480
-  # (the height) at r = 0.99, against r = 0.43 at lag 640 (the width). Filling
-  # an (h x w) matrix column-wise therefore lands each sample at [y, x] with no
-  # transpose.
+  # Reading block by block keeps the peak memory near the size of the result
+  # instead of holding every sample twice, and a band subset never
+  # materialises the bands it drops.
   out <- array(0.0, dim = c(h, w, length(keep)))
-  for (k in seq_along(keep)) {
-    plane <- v[seq.int(from = keep[k], to = length(v), by = nb)]
-    out[, , k] <- matrix(plane, nrow = h, ncol = w)
+  per_column <- as.double(h) * as.double(nb)
+  step <- .chunk_columns(per_column, w)
+  for (first in seq.int(1L, w, by = step)) {
+    cols <- first:min(first + step - 1L, w)
+    n <- per_column * length(cols)
+    v <- readBin(con, what = "double", n = n, size = 4L, endian = "big")
+    if (length(v) != n) {
+      .abort_truncated(path, n_values, (first - 1) * per_column + length(v))
+    }
+    dim(v) <- c(nb, h, length(cols))
+    if (!is.null(bands)) v <- v[keep, , , drop = FALSE]
+    out[, cols, ] <- aperm(v, c(2L, 3L, 1L))
   }
 
   attr(out, "wavelengths") <- tivis_get_wavelengths(nb)[keep]
@@ -245,6 +258,17 @@ tivis_example_file <- function() {
     )
   }
   path
+}
+
+# Number of image columns to read per block. One column holds `per_column`
+# samples (height x bands); a block holds about 1 million samples (8 MB as
+# doubles) unless the internal option `tivis.r.chunk_values` says otherwise.
+.chunk_columns <- function(per_column, w) {
+  budget <- getOption("tivis.r.chunk_values", 1e6)
+  if (!is.numeric(budget) || length(budget) != 1L || is.na(budget)) {
+    budget <- 1e6
+  }
+  as.integer(min(w, max(1, floor(budget / per_column))))
 }
 
 # Signal a cube whose file holds fewer samples than its header promises.

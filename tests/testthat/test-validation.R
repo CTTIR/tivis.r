@@ -141,3 +141,26 @@ test_that("profiled reads subset declared wavelengths with the bands", {
   unknown <- tivis_read_cube_profiled(f, bands = 1:2)
   expect_identical(attr(unknown, "wavelengths"), c(NA_real_, NA_real_))
 })
+
+test_that("block-wise reading gives the same cube for every block size", {
+  tmp <- withr::local_tempfile(fileext = "_SpecCube.dat")
+  truth <- coordinate_cube(3, 5, 2)
+  write_cube(truth, tmp)
+  # one column holds 3 x 2 = 6 samples; the budgets below give blocks of
+  # one column, two columns with a remainder, and the whole image
+  for (budget in c(1, 6, 13, 29, 30, 1e6, NA, "x")) {
+    withr::local_options(tivis.r.chunk_values = budget)
+    expect_equal(tivis_read_cube(tmp), truth, ignore_attr = TRUE)
+    expect_equal(tivis_read_cube(tmp, bands = 2L)[, , 1], truth[, , 2])
+    expect_equal(
+      tivis_read_cube(tmp, bands = c(2L, 1L, 2L)), truth[, , c(2, 1, 2)],
+      ignore_attr = TRUE
+    )
+  }
+})
+
+test_that("an empty band selection returns an empty cube", {
+  cube <- tivis_read_cube(tivis_example_file(), bands = integer(0))
+  expect_equal(dim(cube), c(12L, 16L, 0L))
+  expect_identical(attr(cube, "wavelengths"), numeric(0))
+})
