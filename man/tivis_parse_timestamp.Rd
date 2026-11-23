@@ -4,19 +4,38 @@
 \alias{tivis_parse_timestamp}
 \title{Parse a TIVITA Filename Timestamp}
 \usage{
-tivis_parse_timestamp(x)
+tivis_parse_timestamp(x, tz = "UTC")
 }
 \arguments{
-\item{x}{Character vector of file or directory names.}
+\item{x}{Character vector of file or directory names. Full paths are
+accepted; only the last path component is inspected.}
+
+\item{tz}{Time zone used to label the parsed wall-clock time. Default
+\code{"UTC"}.}
 }
 \value{
-A \code{POSIXct} vector, \code{NA} where no timestamp is present.
+A \code{POSIXct} vector of the same length as \code{x}, \code{NA} where no valid
+timestamp is present (including \code{NA} input).
 }
 \description{
 TIVITA names every artefact of a recording \verb{YYYY_MM_DD_HH_MM_SS_<what>}.
 This extracts the acquisition time from such a name.
 }
+\details{
+The file name records the wall-clock time of the acquisition computer and
+carries no time-zone information. The digits are therefore taken as they
+are and labelled with \code{tz}; no conversion takes place. Pass the time zone
+of the recording site if the result is compared with other clocks.
+}
 \examples{
 tivis_parse_timestamp("2000_01_01_12_00_00_SpecCube.dat")
+
+# full paths work, and names without a timestamp give NA
+tivis_parse_timestamp(c("/archive/2000_01_01_12_00_00_SpecCube.dat",
+                        "notes.txt"))
+
+# label the wall-clock time with the recording site's time zone
+tivis_parse_timestamp("2000_01_01_12_00_00_SpecCube.dat",
+                      tz = "Europe/Berlin")
 
 }

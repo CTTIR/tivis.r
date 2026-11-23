@@ -6,6 +6,14 @@ test_that("path arguments must be one non-missing string", {
   expect_error(tivis_read_cube(character(0)), "single path")
   expect_error(tivis_get_metadata(NA_character_), "single path")
   expect_error(tivis_reference_images(c("a", "b")), "single path")
+  expect_error(tivis_list_measurements(NULL), "single path")
+  expect_error(tivis_measurement(NA_character_), "single path")
+})
+
+test_that("the error names the argument and the calling function", {
+  err <- expect_error(tivis_list_measurements(NA_character_))
+  expect_match(conditionMessage(err), "root")
+  expect_match(format(conditionCall(err)), "tivis_list_measurements")
 })
 
 test_that("a directory is not accepted as a cube", {

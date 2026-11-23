@@ -12,13 +12,16 @@ tivis_list_measurements(root, recursive = TRUE)
 \item{recursive}{Logical. Descend into subdirectories. Default \code{TRUE}.}
 }
 \value{
-A data frame with one row per recording: \code{path}, \code{dir}, \code{timestamp},
-\code{width}, \code{height}, \code{bands}, \code{file_size}, and \code{n_reference_images}. Zero
-rows if nothing matches.
+A data frame with one row per recording: \code{path}, \code{dir}, \code{timestamp}
+(\code{POSIXct}, see \code{\link[=tivis_parse_timestamp]{tivis_parse_timestamp()}}), \code{width}, \code{height}, \code{bands},
+\code{file_size}, and \code{n_reference_images}. Zero rows if nothing matches. A
+cube whose header cannot be decoded is still listed, with \code{NA} for
+\code{width}, \code{height}, \code{bands} and \code{file_size}.
 }
 \description{
 Walks a directory tree and returns one row per recording found. Only headers
-are read, so scanning a large archive is cheap.
+are read, so scanning a large archive is cheap. A file is a recording when
+its name ends in \verb{_SpecCube.dat}.
 }
 \examples{
 # Build a tiny archive in a temporary directory from the bundled example

@@ -12,16 +12,30 @@ tivis_measurement(path, bands = NULL)
 \item{bands}{Optional integer vector of band indices. \code{NULL} reads all.}
 }
 \value{
-A list with \code{cube}, \code{wavelengths}, \code{metadata}, \code{references},
-\code{timestamp} and \code{path}.
+A plain list with
+\itemize{
+\item \code{cube}: the array returned by \code{\link[=tivis_read_cube]{tivis_read_cube()}};
+\item \code{wavelengths}: its wavelength axis in nanometres;
+\item \code{metadata}: the result of \code{\link[=tivis_get_metadata]{tivis_get_metadata()}}, an empty list when
+no log is found;
+\item \code{references}: the result of \code{\link[=tivis_reference_images]{tivis_reference_images()}};
+\item \code{timestamp}: the result of \code{\link[=tivis_parse_timestamp]{tivis_parse_timestamp()}};
+\item \code{path}: the input path.
+}
 }
 \description{
 Convenience wrapper returning the cube together with everything the Suite
 stored alongside it: acquisition metadata and the paths of the exported
 parameter images.
 }
+\details{
+The acquisition log is looked up beside the cube by replacing the
+\verb{_SpecCube.dat} suffix with \verb{_meta.log}. A cube that does not follow this
+naming scheme is read without metadata.
+}
 \examples{
 m <- tivis_measurement(tivis_example_file())
 dim(m$cube)
+m$metadata$Camera$Exposure
 
 }

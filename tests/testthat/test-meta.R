@@ -202,6 +202,38 @@ test_that("an empty log and a directory both yield an empty list", {
   expect_identical(tivis_get_metadata(withr::local_tempdir()), list())
 })
 
+test_that("timestamps tolerate missing values and full paths", {
+  # NA used to abort the whole vector with a subscript error
+  expect_true(is.na(tivis_parse_timestamp(NA)))
+  expect_s3_class(tivis_parse_timestamp(NA), "POSIXct")
+  ts <- tivis_parse_timestamp(c(
+    "2000_01_01_12_00_00_SpecCube.dat", NA, "x.dat",
+    "/archive/run 1/2021_06_07_08_09_10_SpecCube.dat",
+    "2021_06_07_08_09_10", "2000_13_45_00_00_00_SpecCube.dat",
+    "x_2000_01_01_12_00_00_SpecCube.dat"
+  ))
+  expect_equal(is.na(ts), c(FALSE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE))
+  expect_equal(format(ts[c(1, 4, 5)], "%Y-%m-%d %H:%M:%S"),
+               c("2000-01-01 12:00:00", "2021-06-07 08:09:10",
+                 "2021-06-07 08:09:10"))
+  expect_length(tivis_parse_timestamp(character(0)), 0L)
+  expect_s3_class(tivis_parse_timestamp(character(0)), "POSIXct")
+  expect_equal(tivis_parse_timestamp(factor("2000_01_01_12_00_00_x")), ts[1])
+})
+
+test_that("timestamps are wall-clock times labelled with tz", {
+  name <- "2000_07_01_12_00_00_SpecCube.dat"
+  utc <- tivis_parse_timestamp(name)
+  berlin <- tivis_parse_timestamp(name, tz = "Europe/Berlin")
+  expect_identical(attr(utc, "tzone"), "UTC")
+  expect_identical(attr(berlin, "tzone"), "Europe/Berlin")
+  # same digits on the clock, two hours apart as instants (CEST)
+  expect_equal(format(berlin, "%H:%M"), "12:00")
+  expect_equal(as.numeric(difftime(utc, berlin, units = "hours")), 2)
+  expect_error(tivis_parse_timestamp(name, tz = NA), "time-zone")
+  expect_error(tivis_parse_timestamp(name, tz = c("UTC", "UTC")), "time-zone")
+})
+
 test_that("recordings sharing a directory keep their own reference images", {
   dir <- withr::local_tempdir()
   first <- "2000_01_01_12_00_00_"
@@ -250,3 +282,71 @@ test_that("reference images handle empty and missing directories", {
   )
 })
 
+test_that("empty and populated discovery results have the same structure", {
+  dir <- withr::local_tempdir()
+  empty <- tivis_list_measurements(dir)
+  file.copy(tivis_example_file(),
+            file.path(dir, "2020_01_02_03_04_05_SpecCube.dat"))
+  full <- tivis_list_measurements(dir)
+
+  expect_identical(names(empty), names(full))
+  expect_identical(lapply(empty, class), lapply(full, class))
+  # the empty frame used to carry the session time zone instead of UTC
+  expect_identical(attr(empty$timestamp, "tzone"), "UTC")
+  expect_identical(attr(full$timestamp, "tzone"), "UTC")
+  expect_identical(full$dir, dirname(full$path))
+  expect_identical(full$file_size, as.numeric(file.size(full$path)))
+})
+
+test_that("discovery respects recursive and reports unreadable cubes", {
+  dir <- withr::local_tempdir()
+  dir.create(file.path(dir, "sub"))
+  file.copy(tivis_example_file(),
+            file.path(dir, "sub", "2020_01_02_03_04_05_SpecCube.dat"))
+  writeBin(raw(64), file.path(dir, "2020_01_01_00_00_00_SpecCube.dat"))
+  file.create(file.path(dir, "not-a-cube.dat"))
+
+  expect_equal(nrow(tivis_list_measurements(dir, recursive = FALSE)), 1L)
+  res <- tivis_list_measurements(dir)
+  expect_equal(nrow(res), 2L)
+  # the zero-filled file is listed, with NA instead of a made-up geometry
+  expect_equal(res$width, c(NA, 16L))
+  expect_equal(res$bands, c(NA, 8L))
+  expect_true(is.na(res$file_size[1]))
+  expect_false(anyNA(res$timestamp))
+
+  expect_error(tivis_list_measurements(file.path(dir, "missing")),
+               "Directory not found")
+})
+
+test_that("a cube without the SpecCube suffix is read without metadata", {
+  # sub() left such a path unchanged, so the binary cube was parsed as its
+  # own log and the call failed on invalid strings
+  dir <- withr::local_tempdir()
+  f <- file.path(dir, "cube.dat")
+  file.copy(tivis_example_file(), f)
+  m <- expect_no_warning(tivis_measurement(f))
+  expect_identical(m$metadata, list())
+  expect_equal(dim(m$cube), c(12L, 16L, 8L))
+  expect_true(is.na(m$timestamp))
+})
+
+test_that("tivis_measurement picks up the sibling log and band subset", {
+  dir <- withr::local_tempdir()
+  stamp <- "2021_06_07_08_09_10_"
+  f <- file.path(dir, paste0(stamp, "SpecCube.dat"))
+  file.copy(tivis_example_file(), f)
+  file.copy(example_log(), file.path(dir, paste0(stamp, "meta.log")))
+  file.create(file.path(dir, paste0(stamp, "TWI.png")))
+
+  m <- tivis_measurement(f, bands = c(2L, 4L))
+  expect_equal(dim(m$cube), c(12L, 16L, 2L))
+  expect_equal(m$wavelengths, c(505, 515))
+  expect_equal(m$metadata$Aufnahme$Aufnahmemodus, "Reflektanz")
+  expect_named(m$references, "TWI")
+  expect_equal(format(m$timestamp, "%Y-%m-%d %H:%M:%S"), "2021-06-07 08:09:10")
+
+  # a recording without a log degrades to an empty list
+  unlink(file.path(dir, paste0(stamp, "meta.log")))
+  expect_identical(tivis_measurement(f)$metadata, list())
+})
