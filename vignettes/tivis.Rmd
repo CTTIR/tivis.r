@@ -31,6 +31,11 @@ resource_files:
 </div>
 <!-- cttir-vignette-logo: end -->
 
+<style>
+/* The pkgdown article header already shows the logo; hide this copy there. */
+.template-article .cttir-vignette-logo { display: none; }
+</style>
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(tivis.r)
@@ -84,9 +89,10 @@ head(tivis_get_wavelengths(100L))
 The array is ordinary R data, so base graphics are enough for a first look.
 Row 1 is the top of the image, which is why the y axis below runs downwards.
 The bundled example is a synthetic 16 × 12 pixel cube with eight bands: a
-bright disc on a diagonal gradient.
+disc of higher reflectance on a diagonal gradient. The colour key gives the
+scale.
 
-```{r first-look, fig.width = 8, fig.height = 3.4, dpi = 144, out.width = "100%", fig.alt = "Two panels. Left: false-colour image of band 4 (515 nm) of the bundled 16 by 12 pixel example cube, with a colour key for reflectance from about 0.15 to 0.48. A bright disc sits in the centre of a gradient that brightens towards the lower right. The y axis is labelled Row and runs downwards from 1 to 12. Right: mean reflectance of the disc and of the background across the eight bands from 500 to 535 nm. Both curves peak at 515 nm, the disc at about 0.39 and the background at about 0.24."}
+```{r first-look, fig.width = 8, fig.height = 3.4, dpi = 144, out.width = "100%", fig.alt = "Two panels. Left: false-colour image of band 4 (515 nm) of the bundled 16 by 12 pixel example cube, with a colour key for reflectance from about 0.15 to 0.48. A disc of high reflectance, about 0.4 to 0.48, sits in the centre of a gradient that rises from about 0.15 in the upper left to about 0.35 in the lower right. The y axis is labelled Row and runs downwards from 1 to 12. Right: mean reflectance of the disc and of the background across the eight bands from 500 to 535 nm. Both curves peak at 515 nm, the disc at about 0.39 and the background at about 0.24."}
 wl <- attr(cube, "wavelengths")
 band <- cube[, , 4]
 disc <- band > mean(range(band))
