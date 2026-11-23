@@ -47,21 +47,30 @@ names(m$references)
 
 # Scan an archive cheaply (headers only)
 tivis_list_measurements("/archive/tivita")
+
+# Read without assuming a wavelength axis: declare it, or leave it NA
+tivis_read_cube_profiled("2000_01_01_12_00_00_SpecCube.dat")
 ```
+
+The package ships a small synthetic recording, so everything can be
+tried without clinical data: `tivis_read_cube(tivis_example_file())`.
+See
+[`vignette("tivis")`](https://cttir.github.io/tivis.r/articles/tivis.md)
+for a walk-through.
 
 ## The file format
 
 TIVITA does not publish a specification, so the format was determined
 empirically:
 
-|             |                                                             |
-|-------------|-------------------------------------------------------------|
-| Header      | 12 bytes: three big-endian `uint32` — width, height, bands  |
-| Samples     | big-endian `float32`                                        |
-| Band order  | band-interleaved-by-pixel (all bands of a pixel contiguous) |
-| Pixel order | **column-major** — y varies fastest                         |
-| Wavelengths | 500–995 nm in 5 nm steps (100 bands)                        |
-| Values      | calibrated reflectance; may fall slightly outside `[0, 1]`  |
+|  |  |
+|----|----|
+| Header | 12 bytes: three big-endian `uint32` — width, height, bands |
+| Samples | big-endian `float32` |
+| Band order | band-interleaved-by-pixel (all bands of a pixel contiguous) |
+| Pixel order | **column-major** — y varies fastest |
+| Wavelengths | not stored in the file; the reader attaches the nominal axis, 500–995 nm in 5 nm steps (100 bands) |
+| Values | calibrated reflectance; may fall slightly outside `[0, 1]` |
 
 The header decodes to `640, 480, 100` and the file size equals
 `12 + 640 × 480 × 100 × 4` exactly. Big-endian `float32` gives

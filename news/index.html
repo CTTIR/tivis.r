@@ -51,11 +51,50 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="tivisr-020">tivis.r 0.2.0<a class="anchor" aria-label="anchor" href="#tivisr-020"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/tivis_measurement.html">tivis_measurement()</a></code> no longer fails for a cube whose name does not end in <code>_SpecCube.dat</code>. The log path was derived by substitution, so such a cube was parsed as its own metadata log and the call aborted on invalid strings. These cubes are now read with empty metadata.</li>
+<li>
+<code><a href="../reference/tivis_parse_timestamp.html">tivis_parse_timestamp()</a></code> returns <code>NA</code> for <code>NA</code> input instead of aborting the whole vector, and accepts full paths: only the last path component is inspected.</li>
+<li>
+<code><a href="../reference/tivis_get_metadata.html">tivis_get_metadata()</a></code> keeps values written in double quotes as strings. Previously the content was coerced after the quotes were stripped, so the identifier <code>"0012"</code> became <code>12</code> and the version <code>"2.0"</code> became <code>2</code>. <strong>Behaviour change:</strong> quoted numbers and quoted <code>TRUE</code>/<code>FALSE</code> are now returned as text; unquoted values are converted as before.</li>
+<li>
+<code><a href="../reference/tivis_get_metadata.html">tivis_get_metadata()</a></code> reads logs saved as UTF-8 correctly (they were decoded as <code>latin1</code> a second time), returns all strings in UTF-8, ignores a byte-order mark, and returns an empty list for a directory. A binary file, such as the cube itself, is rejected with an informative error instead of being parsed.</li>
+<li>
+<code><a href="../reference/tivis_reference_images.html">tivis_reference_images()</a></code> returns only the images of the given recording when the cube name carries a TIVITA timestamp. Recordings sharing one directory used to receive each other’s images, which also inflated <code>n_reference_images</code> in <code><a href="../reference/tivis_list_measurements.html">tivis_list_measurements()</a></code>. <code>.PNG</code> is matched case-insensitively.</li>
+<li>
+<code><a href="../reference/tivis_list_measurements.html">tivis_list_measurements()</a></code> returns its empty result with the same UTC <code>timestamp</code> column as a populated one.</li>
+<li>
+<code><a href="../reference/tivis_read_cube.html">tivis_read_cube()</a></code> rejects fractional band indices such as <code>2.7</code> instead of truncating them, checks <code>bands</code> before reading the samples, and with <code>validate = FALSE</code> no longer asks for more samples than the file holds: a corrupt header could request an arbitrarily large allocation.</li>
+<li>
+<code><a href="../reference/tivis_get_wavelengths.html">tivis_get_wavelengths()</a></code> rejects a fractional band count.</li>
+<li>All readers check that the path argument is a single non-missing string, and <code><a href="../reference/tivis_read_header.html">tivis_read_header()</a></code> reports a directory as such.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/tivis_parse_timestamp.html">tivis_parse_timestamp()</a></code> gains a <code>tz</code> argument (default <code>"UTC"</code>, as before) to label the wall-clock time in the file name with the time zone of the recording site.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="performance-0-2-0">Performance<a class="anchor" aria-label="anchor" href="#performance-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/tivis_read_cube.html">tivis_read_cube()</a></code> reads the file in blocks of image columns instead of loading every sample before rearranging them. For a synthetic cube of the native size (640 x 480 x 100, 246 MB as an R array) the peak memory of a full read fell from about 700 MB to about 365 MB, and that of a three-band read from about 265 MB to about 60 MB, at unchanged or slightly better speed. A band subset no longer holds the bands it drops.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-2-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-0"></a></h3>
+<ul><li>The help pages of <code><a href="../reference/tivis_read_cube.html">tivis_read_cube()</a></code> and <code><a href="../reference/tivis_get_wavelengths.html">tivis_get_wavelengths()</a></code> and the vignette no longer state that the layout and the wavelength axis were validated against the Suite’s RGB export. That comparison had been withdrawn (see the format notes for 0.1.0 below) but was still cited. The wavelength axis is now described as what it is: the nominal axis assumed by the reader, not stored in the file.</li>
+<li>The vignette gains a figure of the example cube and sections on <code><a href="../reference/tivis_read_cube_profiled.html">tivis_read_cube_profiled()</a></code> and timestamps; the conversion rules of <code><a href="../reference/tivis_get_metadata.html">tivis_get_metadata()</a></code> and the time-zone handling of timestamps are documented.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="packaging-0-2-0">Packaging<a class="anchor" aria-label="anchor" href="#packaging-0-2-0"></a></h3>
 <ul><li>Prepare the package for CRAN: runnable examples for <code><a href="../reference/tivis_list_measurements.html">tivis_list_measurements()</a></code> and <code><a href="../reference/tivis_reference_images.html">tivis_reference_images()</a></code> that work in a temporary directory, full documentation and examples for <code><a href="../reference/tivis_read_cube_profiled.html">tivis_read_cube_profiled()</a></code>, and a corrected <code>\value</code> for <code><a href="../reference/tivis_available.html">tivis_available()</a></code>.</li>
 <li>Update the maintainer e-mail address to <a href="mailto:raban.heller@uni-ulm.de" class="email">raban.heller@uni-ulm.de</a>.</li>
 <li>Declare <code>Language: en-GB</code> to match the British spelling used throughout and add an <code>inst/WORDLIST</code> for the spell check.</li>
 <li>Add <code>cran-comments.md</code>.</li>
+<li>Drop the unused <code>png</code> package from <code>Suggests</code>.</li>
 </ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="tivisr-010">tivis.r 0.1.0<a class="anchor" aria-label="anchor" href="#tivisr-010"></a></h2>
 <ul><li>Standardize the named v5 package logo across README, documentation pages and available application headers, with matching light and dark artwork.</li>

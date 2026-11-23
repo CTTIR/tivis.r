@@ -19,13 +19,29 @@ tivis_get_metadata(path)
 ## Value
 
 A named list of sections, each a named list of entries. Returns an empty
-list if the file does not exist.
+list if the file does not exist. A binary file, such as the cube itself,
+is rejected with an error.
 
 ## Details
 
-Numeric-looking values are converted to numbers (`"7,000000"` becomes
-`7`), `TRUE`/`FALSE` become logicals, and surrounding quotes are
-stripped. Unrecognised values are returned as trimmed strings.
+Values are converted as follows:
+
+- a value in double quotes is a string. The quotes are stripped and the
+  content is returned verbatim, so identifiers and version strings such
+  as `"0012"` or `"2.0"` keep their leading and trailing zeros;
+
+- an unquoted number becomes a numeric, with a decimal comma or a
+  decimal point (`7,000000` becomes `7`);
+
+- an unquoted `TRUE` or `FALSE` (in any case) becomes a logical;
+
+- anything else is returned as a trimmed string.
+
+Strings are returned in UTF-8. A file that is already valid UTF-8 is
+read as such; any other file is taken to be `latin1`. Lines starting
+with `;` or `#` are comments. Entries before the first section header
+are collected in a section named `general`. If a key occurs twice in a
+section, the last value wins.
 
 ## Examples
 

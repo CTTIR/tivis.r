@@ -22,8 +22,9 @@ tivis_read_header(path, validate = TRUE)
 
 ## Value
 
-A named list with `width`, `height`, `bands`, `n_values` and
-`file_size`.
+A named list with `width`, `height`, `bands` (integers), `n_values` (the
+number of samples the header implies, `width * height * bands`) and
+`file_size` (bytes).
 
 ## Examples
 

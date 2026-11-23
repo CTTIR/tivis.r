@@ -74,42 +74,63 @@ binary format, so this package needs no vendor SDK and no compiled code.</p>
 
 
 <dt id="arg-bands">bands<a class="anchor" aria-label="anchor" href="#arg-bands"></a></dt>
-<dd><p>Optional integer vector of band indices to read. <code>NULL</code>
-(default) reads every band. Selecting a subset still reads the whole file,
-but returns only the requested bands.</p></dd>
+<dd><p>Optional integer vector of band indices to read, in the order
+wanted. <code>NULL</code> (default) reads every band. Selecting a subset still reads
+through the whole file, but keeps only the requested bands in memory.
+Fractional, missing and out-of-range indices are rejected.</p></dd>
 
 
 <dt id="arg-validate">validate<a class="anchor" aria-label="anchor" href="#arg-validate"></a></dt>
 <dd><p>Logical. Check that the file size matches the header before
-reading. Default <code>TRUE</code>; there is no good reason to disable it.</p></dd>
+reading. Default <code>TRUE</code>; there is no good reason to disable it. With
+<code>FALSE</code>, a file longer than the header implies is read up to the size the
+header describes; a shorter file is still rejected as truncated.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A numeric array with dimensions <code>(rows, cols, bands)</code> — matching the
 convention used by <code>hyperspectR::hsi_cube()</code> — carrying a <code>wavelengths</code>
-attribute in nanometres.</p>
+attribute in nanometres. The wavelengths are the nominal axis from
+<code><a href="tivis_get_wavelengths.html">tivis_get_wavelengths()</a></code>, not values stored in the file.</p>
     </div>
     <div class="section level2">
     <h2 id="file-format">File format<a class="anchor" aria-label="anchor" href="#file-format"></a></h2>
 
 
-<p>The format was determined empirically from reference captures and validated
-against the TIVITA Suite's own <code>_RGB-Image.png</code> exports:</p><ul><li><p>a 12-byte header of three <strong>big-endian</strong> <code>uint32</code> values giving
+<p>The vendor publishes no specification. The format was determined
+empirically from reference captures, by measuring the periodicity of the
+sample stream itself:</p><ul><li><p>a 12-byte header of three <strong>big-endian</strong> <code>uint32</code> values giving
 <code>width</code>, <code>height</code> and <code>bands</code>;</p></li>
 <li><p>followed by <strong>big-endian</strong> <code>float32</code> samples;</p></li>
 <li><p>stored <strong>band-interleaved-by-pixel</strong> (BIP): all bands of one pixel are
-contiguous; this reader implements column-major spatial planes
-(y varies fastest).
+contiguous (the autocorrelation of the raw stream peaks at a lag equal to
+the band count);</p></li>
+<li><p>with column-major spatial planes, y varying fastest (the autocorrelation
+of an extracted band plane peaks at a lag equal to the image height).
 Device/export qualification requires an independent geometry fixture.</p></li>
-</ul><p>Values are calibrated reflectance. They are normally within <code>[0, 1]</code> but may
+</ul><p>An earlier comparison with the Suite's <code>_RGB-Image.png</code> export was
+withdrawn as evidence: that image is rotated and rescaled relative to the
+cube and cannot serve as pixel-level ground truth (see <code>NEWS.md</code>).</p>
+<p>Values are calibrated reflectance. They are normally within <code>[0, 1]</code> but may
 fall slightly below zero or exceed one in specular and saturated regions, so
 the reader does not clamp them.</p>
     </div>
     <div class="section level2">
+    <h2 id="memory">Memory<a class="anchor" aria-label="anchor" href="#memory"></a></h2>
+
+
+<p>Samples are stored as 4-byte floats and returned as 8-byte doubles, so a
+native 640 x 480 x 100 cube of 123 MB occupies about 246 MB in R. The file
+is read in blocks of image columns, so little working memory is needed
+beyond the returned array, and a band subset never holds the bands it
+drops.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="tivis_read_header.html">tivis_read_header()</a></code> for header-only access,
-<code><a href="tivis_get_wavelengths.html">tivis_get_wavelengths()</a></code> for the wavelength axis.</p></div>
+<code><a href="tivis_get_wavelengths.html">tivis_get_wavelengths()</a></code> for the wavelength axis,
+<code><a href="tivis_read_cube_profiled.html">tivis_read_cube_profiled()</a></code> to read without assuming a wavelength axis.</p></div>
     </div>
 
     <div class="section level2">

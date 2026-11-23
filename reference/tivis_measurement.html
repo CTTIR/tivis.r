@@ -79,8 +79,19 @@ parameter images.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with <code>cube</code>, <code>wavelengths</code>, <code>metadata</code>, <code>references</code>,
-<code>timestamp</code> and <code>path</code>.</p>
+    <p>A plain list with</p><ul><li><p><code>cube</code>: the array returned by <code><a href="tivis_read_cube.html">tivis_read_cube()</a></code>;</p></li>
+<li><p><code>wavelengths</code>: its wavelength axis in nanometres;</p></li>
+<li><p><code>metadata</code>: the result of <code><a href="tivis_get_metadata.html">tivis_get_metadata()</a></code>, an empty list when
+no log is found;</p></li>
+<li><p><code>references</code>: the result of <code><a href="tivis_reference_images.html">tivis_reference_images()</a></code>;</p></li>
+<li><p><code>timestamp</code>: the result of <code><a href="tivis_parse_timestamp.html">tivis_parse_timestamp()</a></code>;</p></li>
+<li><p><code>path</code>: the input path.</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The acquisition log is looked up beside the cube by replacing the
+<code>_SpecCube.dat</code> suffix with <code>_meta.log</code>. A cube that does not follow this
+naming scheme is read without metadata.</p>
     </div>
 
     <div class="section level2">
@@ -88,6 +99,8 @@ parameter images.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">tivis_measurement</span><span class="op">(</span><span class="fu"><a href="tivis_example_file.html">tivis_example_file</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">cube</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 12 16  8</span>
+<span class="r-in"><span><span class="va">m</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">Camera</span><span class="op">$</span><span class="va">Exposure</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 90</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

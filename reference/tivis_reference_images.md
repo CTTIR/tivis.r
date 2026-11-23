@@ -23,6 +23,14 @@ A named character vector of existing file paths. Names are the parameter
 identifiers used by the Suite, for example `RGB-Image`, `Oxygenation`,
 `NIR-Perfusion`, `THI`, `TWI`, `OHI`. Zero-length if none are present.
 
+## Details
+
+When `path` is a cube whose name starts with a TIVITA timestamp
+(`YYYY_MM_DD_HH_MM_SS_`), only the images carrying the same timestamp
+are returned, so recordings that share one directory are kept apart.
+When `path` is a directory, or a cube without a timestamp in its name,
+every PNG in the directory is returned.
+
 ## Examples
 
 ``` r
@@ -34,6 +42,6 @@ invisible(file.copy(tivis_example_file(), cube))
 invisible(file.create(file.path(rec, "2000_01_01_12_00_00_Oxygenation.png")))
 tivis_reference_images(cube)
 #>                                                            Oxygenation 
-#> "/tmp/Rtmp5LSkOQ/tivita-recording/2000_01_01_12_00_00_Oxygenation.png" 
+#> "/tmp/RtmpwQ1clm/tivita-recording/2000_01_01_12_00_00_Oxygenation.png" 
 unlink(rec, recursive = TRUE)
 ```

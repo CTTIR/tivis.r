@@ -22,8 +22,30 @@ tivis_measurement(path, bands = NULL)
 
 ## Value
 
-A list with `cube`, `wavelengths`, `metadata`, `references`, `timestamp`
-and `path`.
+A plain list with
+
+- `cube`: the array returned by
+  [`tivis_read_cube()`](https://cttir.github.io/tivis.r/reference/tivis_read_cube.md);
+
+- `wavelengths`: its wavelength axis in nanometres;
+
+- `metadata`: the result of
+  [`tivis_get_metadata()`](https://cttir.github.io/tivis.r/reference/tivis_get_metadata.md),
+  an empty list when no log is found;
+
+- `references`: the result of
+  [`tivis_reference_images()`](https://cttir.github.io/tivis.r/reference/tivis_reference_images.md);
+
+- `timestamp`: the result of
+  [`tivis_parse_timestamp()`](https://cttir.github.io/tivis.r/reference/tivis_parse_timestamp.md);
+
+- `path`: the input path.
+
+## Details
+
+The acquisition log is looked up beside the cube by replacing the
+`_SpecCube.dat` suffix with `_meta.log`. A cube that does not follow
+this naming scheme is read without metadata.
 
 ## Examples
 
@@ -31,4 +53,6 @@ and `path`.
 m <- tivis_measurement(tivis_example_file())
 dim(m$cube)
 #> [1] 12 16  8
+m$metadata$Camera$Exposure
+#> [1] 90
 ```

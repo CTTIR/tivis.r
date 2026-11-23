@@ -76,13 +76,23 @@ encoding and comma decimal separators; all three are handled here.</p>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A named list of sections, each a named list of entries. Returns an
-empty list if the file does not exist.</p>
+empty list if the file does not exist. A binary file, such as the cube
+itself, is rejected with an error.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Numeric-looking values are converted to numbers (<code>"7,000000"</code> becomes
-<code>7</code>), <code>TRUE</code>/<code>FALSE</code> become logicals, and surrounding quotes are stripped.
-Unrecognised values are returned as trimmed strings.</p>
+    <p>Values are converted as follows:</p><ul><li><p>a value in double quotes is a string. The quotes are stripped and the
+content is returned verbatim, so identifiers and version strings such as
+<code>"0012"</code> or <code>"2.0"</code> keep their leading and trailing zeros;</p></li>
+<li><p>an unquoted number becomes a numeric, with a decimal comma or a decimal
+point (<code>7,000000</code> becomes <code>7</code>);</p></li>
+<li><p>an unquoted <code>TRUE</code> or <code>FALSE</code> (in any case) becomes a logical;</p></li>
+<li><p>anything else is returned as a trimmed string.</p></li>
+</ul><p>Strings are returned in UTF-8. A file that is already valid UTF-8 is read
+as such; any other file is taken to be <code>latin1</code>. Lines starting with <code>;</code>
+or <code>#</code> are comments. Entries before the first section header are collected
+in a section named <code>general</code>. If a key occurs twice in a section, the last
+value wins.</p>
     </div>
 
     <div class="section level2">

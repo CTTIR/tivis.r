@@ -120,7 +120,11 @@
 <span><span class="co">#&gt; "NIR-Perfusion" "Oxygenation" "RGB-Image" "THI" "TWI"</span></span>
 <span></span>
 <span><span class="co"># Scan an archive cheaply (headers only)</span></span>
-<span><span class="fu"><a href="reference/tivis_list_measurements.html">tivis_list_measurements</a></span><span class="op">(</span><span class="st">"/archive/tivita"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/tivis_list_measurements.html">tivis_list_measurements</a></span><span class="op">(</span><span class="st">"/archive/tivita"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Read without assuming a wavelength axis: declare it, or leave it NA</span></span>
+<span><span class="fu"><a href="reference/tivis_read_cube_profiled.html">tivis_read_cube_profiled</a></span><span class="op">(</span><span class="st">"2000_01_01_12_00_00_SpecCube.dat"</span><span class="op">)</span></span></code></pre></div>
+<p>The package ships a small synthetic recording, so everything can be tried without clinical data: <code>tivis_read_cube(tivis_example_file())</code>. See <code><a href="articles/tivis.html">vignette("tivis")</a></code> for a walk-through.</p>
 </div>
 <div class="section level2">
 <h2 id="the-file-format">The file format<a class="anchor" aria-label="anchor" href="#the-file-format"></a>
@@ -152,7 +156,7 @@
 </tr>
 <tr>
 <td>Wavelengths</td>
-<td>500–995 nm in 5 nm steps (100 bands)</td>
+<td>not stored in the file; the reader attaches the nominal axis, 500–995 nm in 5 nm steps (100 bands)</td>
 </tr>
 <tr>
 <td>Values</td>
