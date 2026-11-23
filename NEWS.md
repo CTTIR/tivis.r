@@ -61,6 +61,8 @@
   `tivis_read_cube_profiled()` and timestamps; the conversion rules of
   `tivis_get_metadata()` and the time-zone handling of timestamps are
   documented.
+* The README heads its licence section "Licence", in line with the British
+  English (`Language: en-GB`) of the documentation.
 
 ## Packaging
 

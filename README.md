@@ -117,7 +117,7 @@ earlier error pass a green suite.
 | [`hyperspectR`](https://github.com/CTTIR/hyperspectR) | `hsi_cube` class, preprocessing, tissue indices |
 | [`hyperspectaculR`](https://github.com/CTTIR/hyperspectaculR) | Publication-grade visualisation |
 
-## License
+## Licence
 
 MIT
 
