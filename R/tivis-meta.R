@@ -4,9 +4,21 @@
 #' writes an INI-style file with German section and key names, `latin1`
 #' encoding and comma decimal separators; all three are handled here.
 #'
-#' Numeric-looking values are converted to numbers (`"7,000000"` becomes
-#' `7`), `TRUE`/`FALSE` become logicals, and surrounding quotes are stripped.
-#' Unrecognised values are returned as trimmed strings.
+#' Values are converted as follows:
+#'
+#' * a value in double quotes is a string. The quotes are stripped and the
+#'   content is returned verbatim, so identifiers and version strings such as
+#'   `"0012"` or `"2.0"` keep their leading and trailing zeros;
+#' * an unquoted number becomes a numeric, with a decimal comma or a decimal
+#'   point (`7,000000` becomes `7`);
+#' * an unquoted `TRUE` or `FALSE` (in any case) becomes a logical;
+#' * anything else is returned as a trimmed string.
+#'
+#' Strings are returned in UTF-8. A file that is already valid UTF-8 is read
+#' as such; any other file is taken to be `latin1`. Lines starting with `;`
+#' or `#` are comments. Entries before the first section header are collected
+#' in a section named `general`. If a key occurs twice in a section, the last
+#' value wins.
 #'
 #' @param path Path to a `*_meta.log` file.
 #'
@@ -19,22 +31,23 @@
 #'
 #' @export
 tivis_get_metadata <- function(path) {
-  if (!file.exists(path)) {
+  path <- .check_path(path)
+  if (!file.exists(path) || dir.exists(path)) {
     return(list())
   }
 
-  # The Suite writes latin1; reading as UTF-8 mangles the registered-trademark
-  # sign in "TIVITA(R) Suite".
-  lines <- readLines(path, encoding = "latin1", warn = FALSE)
-  lines <- trimws(lines)
-  lines <- lines[nzchar(lines) & !startsWith(lines, ";") & !startsWith(lines, "#")]
+  lines <- trimws(.read_log_lines(path))
+  comment <- startsWith(lines, ";") | startsWith(lines, "#")
+  lines <- lines[nzchar(lines) & !comment]
 
   out <- list()
   section <- "general"
 
   for (ln in lines) {
     if (startsWith(ln, "[") && endsWith(ln, "]")) {
-      section <- substr(ln, 2L, nchar(ln) - 1L)
+      section <- trimws(substr(ln, 2L, nchar(ln) - 1L))
+      # a list cannot be indexed by "", so `[]` falls back to the default
+      if (!nzchar(section)) section <- "general"
       if (is.null(out[[section]])) out[[section]] <- list()
       next
     }
@@ -53,12 +66,32 @@ tivis_get_metadata <- function(path) {
 }
 
 
-# Coerce one raw INI value: strip quotes, map booleans, convert German decimals.
+# Read a log as UTF-8 strings. The Suite writes latin1 (its name carries a
+# registered-trademark sign, byte 0xAE), but a log that was re-saved as UTF-8
+# must not be decoded a second time, so each line is converted only when its
+# bytes are not already valid UTF-8.
+.read_log_lines <- function(path) {
+  lines <- readLines(path, warn = FALSE)
+  legacy <- !validUTF8(lines)
+  lines[legacy] <- iconv(lines[legacy], from = "latin1", to = "UTF-8")
+  Encoding(lines) <- "UTF-8"
+  if (length(lines)) {
+    # drop a UTF-8 byte-order mark, which would hide the first section header
+    lines[1L] <- sub("^\ufeff", "", lines[1L])
+  }
+  lines
+}
+
+
+# Coerce one raw INI value: quoted values are strings, bare values are mapped
+# to logicals and numbers (German decimal comma included) where unambiguous.
 .tivis_coerce <- function(x) {
   x <- trimws(x)
-  # strip a single layer of surrounding double quotes
+  # A value in double quotes is a string by declaration. Strip one layer of
+  # quotes and stop: coercing the content would turn the identifier "0012"
+  # into 12 and the version "2.0" into 2.
   if (nchar(x) >= 2L && startsWith(x, "\"") && endsWith(x, "\"")) {
-    x <- substr(x, 2L, nchar(x) - 1L)
+    return(substr(x, 2L, nchar(x) - 1L))
   }
   if (!nzchar(x)) return("")
 
@@ -86,6 +119,12 @@ tivis_get_metadata <- function(path) {
 #' results and are useful as a reference when validating independently
 #' computed indices.
 #'
+#' When `path` is a cube whose name starts with a TIVITA timestamp
+#' (`YYYY_MM_DD_HH_MM_SS_`), only the images carrying the same timestamp are
+#' returned, so recordings that share one directory are kept apart. When
+#' `path` is a directory, or a cube without a timestamp in its name, every
+#' PNG in the directory is returned.
+#'
 #' @param path Path to a `*_SpecCube.dat` file, or to the directory holding it.
 #'
 #' @return A named character vector of existing file paths. Names are the
@@ -105,17 +144,28 @@ tivis_get_metadata <- function(path) {
 #'
 #' @export
 tivis_reference_images <- function(path) {
-  dir <- if (dir.exists(path)) path else dirname(path)
-  if (!dir.exists(dir)) {
-    cli::cli_abort("Directory not found: {.file {dir}}")
+  path <- .check_path(path)
+  is_dir <- dir.exists(path)
+  folder <- if (is_dir) path else dirname(path)
+  if (!dir.exists(folder)) {
+    cli::cli_abort("Directory not found: {.file {folder}}")
   }
 
-  files <- list.files(dir, pattern = "[.]png$", full.names = TRUE)
-  if (!length(files)) return(character(0))
+  files <- list.files(
+    folder, pattern = "[.]png$", full.names = TRUE, ignore.case = TRUE
+  )
 
   # names look like <timestamp>_<Parameter>.png
-  labels <- sub("[.]png$", "", basename(files))
-  labels <- sub("^[0-9]{4}(_[0-9]{2}){5}_", "", labels)
+  stamp <- "^[0-9]{4}(_[0-9]{2}){5}_"
+  if (!is_dir && grepl(stamp, basename(path))) {
+    # keep the images of this recording only: a directory may hold several
+    own <- substr(basename(path), 1L, 20L)
+    files <- files[startsWith(basename(files), own)]
+  }
+  if (!length(files)) return(character(0))
+
+  labels <- sub("[.]png$", "", basename(files), ignore.case = TRUE)
+  labels <- sub(stamp, "", labels)
 
   stats::setNames(files, labels)
 }

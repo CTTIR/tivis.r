@@ -4,6 +4,8 @@ test_that("path arguments must be one non-missing string", {
   expect_error(tivis_read_header(1), "single path")
   expect_error(tivis_read_header(""), "single path")
   expect_error(tivis_read_cube(character(0)), "single path")
+  expect_error(tivis_get_metadata(NA_character_), "single path")
+  expect_error(tivis_reference_images(c("a", "b")), "single path")
 })
 
 test_that("a directory is not accepted as a cube", {

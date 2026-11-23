@@ -19,9 +19,22 @@ writes an INI-style file with German section and key names, \code{latin1}
 encoding and comma decimal separators; all three are handled here.
 }
 \details{
-Numeric-looking values are converted to numbers (\code{"7,000000"} becomes
-\code{7}), \code{TRUE}/\code{FALSE} become logicals, and surrounding quotes are stripped.
-Unrecognised values are returned as trimmed strings.
+Values are converted as follows:
+\itemize{
+\item a value in double quotes is a string. The quotes are stripped and the
+content is returned verbatim, so identifiers and version strings such as
+\code{"0012"} or \code{"2.0"} keep their leading and trailing zeros;
+\item an unquoted number becomes a numeric, with a decimal comma or a decimal
+point (\verb{7,000000} becomes \code{7});
+\item an unquoted \code{TRUE} or \code{FALSE} (in any case) becomes a logical;
+\item anything else is returned as a trimmed string.
+}
+
+Strings are returned in UTF-8. A file that is already valid UTF-8 is read
+as such; any other file is taken to be \code{latin1}. Lines starting with \verb{;}
+or \verb{#} are comments. Entries before the first section header are collected
+in a section named \code{general}. If a key occurs twice in a section, the last
+value wins.
 }
 \examples{
 log_file <- system.file("extdata", "example_meta.log", package = "tivis.r")

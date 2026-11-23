@@ -21,6 +21,13 @@ cube: an RGB rendering plus tissue indices. These are the Suite's own
 results and are useful as a reference when validating independently
 computed indices.
 }
+\details{
+When \code{path} is a cube whose name starts with a TIVITA timestamp
+(\code{YYYY_MM_DD_HH_MM_SS_}), only the images carrying the same timestamp are
+returned, so recordings that share one directory are kept apart. When
+\code{path} is a directory, or a cube without a timestamp in its name, every
+PNG in the directory is returned.
+}
 \examples{
 # Mimic a TIVITA export directory in a temporary location
 rec <- file.path(tempdir(), "tivita-recording")
