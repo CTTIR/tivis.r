@@ -4,7 +4,7 @@ This is a new submission.
 
 `tivis.r` reads hyperspectral recordings written by the Diaspective Vision
 'TIVITA Suite'. It is pure R: no vendor SDK, no compiled code. The example
-cube shipped in `inst/extdata` is a small synthetic file (8 KB), so all
+cube shipped in `inst/extdata` is a small synthetic file (6 KB), so all
 examples, tests and the vignette run offline.
 
 ## Test environments
