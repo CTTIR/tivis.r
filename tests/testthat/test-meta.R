@@ -350,3 +350,12 @@ test_that("tivis_measurement picks up the sibling log and band subset", {
   unlink(file.path(dir, paste0(stamp, "meta.log")))
   expect_identical(tivis_measurement(f)$metadata, list())
 })
+
+test_that("a binary file is not parsed as a log", {
+  # float32 samples are full of 0x3D bytes ("="), so a cube parsed as a log
+  # would yield garbage keys instead of an error
+  expect_error(tivis_get_metadata(tivis_example_file()),
+               "not a TIVITA metadata log")
+  err <- expect_error(tivis_get_metadata(tivis_example_file()))
+  expect_match(format(conditionCall(err)), "tivis_get_metadata")
+})

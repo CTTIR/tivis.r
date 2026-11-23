@@ -16,7 +16,9 @@
   returned as text; unquoted values are converted as before.
 * `tivis_get_metadata()` reads logs saved as UTF-8 correctly (they were decoded
   as `latin1` a second time), returns all strings in UTF-8, ignores a
-  byte-order mark, and returns an empty list for a directory.
+  byte-order mark, and returns an empty list for a directory. A binary file,
+  such as the cube itself, is rejected with an informative error instead of
+  being parsed.
 * `tivis_reference_images()` returns only the images of the given recording
   when the cube name carries a TIVITA timestamp. Recordings sharing one
   directory used to receive each other's images, which also inflated

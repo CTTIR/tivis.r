@@ -11,7 +11,8 @@ tivis_get_metadata(path)
 }
 \value{
 A named list of sections, each a named list of entries. Returns an
-empty list if the file does not exist.
+empty list if the file does not exist. A binary file, such as the cube
+itself, is rejected with an error.
 }
 \description{
 Parses a \verb{*_meta.log} file written beside a TIVITA recording. The Suite

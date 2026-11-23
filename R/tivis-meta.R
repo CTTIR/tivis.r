@@ -23,7 +23,8 @@
 #' @param path Path to a `*_meta.log` file.
 #'
 #' @return A named list of sections, each a named list of entries. Returns an
-#'   empty list if the file does not exist.
+#'   empty list if the file does not exist. A binary file, such as the cube
+#'   itself, is rejected with an error.
 #'
 #' @examples
 #' log_file <- system.file("extdata", "example_meta.log", package = "tivis.r")
@@ -70,7 +71,19 @@ tivis_get_metadata <- function(path) {
 # registered-trademark sign, byte 0xAE), but a log that was re-saved as UTF-8
 # must not be decoded a second time, so each line is converted only when its
 # bytes are not already valid UTF-8.
-.read_log_lines <- function(path) {
+.read_log_lines <- function(path, call = rlang::caller_env()) {
+  # A log is text. NUL bytes mean a binary file, typically the cube itself
+  # passed by mistake; parsing it would return garbage keys without a word.
+  if (any(readBin(path, what = "raw", n = 8192L) == as.raw(0L))) {
+    cli::cli_abort(
+      c(
+        "{.file {basename(path)}} is not a TIVITA metadata log.",
+        "x" = "It contains NUL bytes, as a binary file does.",
+        "i" = "Expected the {.file *_meta.log} text file beside a cube."
+      ),
+      call = call
+    )
+  }
   lines <- readLines(path, warn = FALSE)
   legacy <- !validUTF8(lines)
   lines[legacy] <- iconv(lines[legacy], from = "latin1", to = "UTF-8")
