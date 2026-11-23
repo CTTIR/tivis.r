@@ -25,7 +25,10 @@ This extracts the acquisition time from such a name.
 The file name records the wall-clock time of the acquisition computer and
 carries no time-zone information. The digits are therefore taken as they
 are and labelled with \code{tz}; no conversion takes place. Pass the time zone
-of the recording site if the result is compared with other clocks.
+of the recording site if the result is compared with other clocks. A
+wall-clock time that does not exist in \code{tz}, such as one inside the hour
+skipped at the start of daylight-saving time, cannot be represented and
+may come back as \code{NA}; the default \code{"UTC"} has no such gaps.
 }
 \examples{
 tivis_parse_timestamp("2000_01_01_12_00_00_SpecCube.dat")

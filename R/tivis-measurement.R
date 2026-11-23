@@ -85,7 +85,10 @@ tivis_list_measurements <- function(root, recursive = TRUE) {
 #' The file name records the wall-clock time of the acquisition computer and
 #' carries no time-zone information. The digits are therefore taken as they
 #' are and labelled with `tz`; no conversion takes place. Pass the time zone
-#' of the recording site if the result is compared with other clocks.
+#' of the recording site if the result is compared with other clocks. A
+#' wall-clock time that does not exist in `tz`, such as one inside the hour
+#' skipped at the start of daylight-saving time, cannot be represented and
+#' may come back as `NA`; the default `"UTC"` has no such gaps.
 #'
 #' @param x Character vector of file or directory names. Full paths are
 #'   accepted; only the last path component is inspected.
