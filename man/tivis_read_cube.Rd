@@ -9,17 +9,21 @@ tivis_read_cube(path, bands = NULL, validate = TRUE)
 \arguments{
 \item{path}{Path to a \verb{*_SpecCube.dat} file.}
 
-\item{bands}{Optional integer vector of band indices to read. \code{NULL}
-(default) reads every band. Selecting a subset still reads the whole file,
-but returns only the requested bands.}
+\item{bands}{Optional integer vector of band indices to read, in the order
+wanted. \code{NULL} (default) reads every band. Selecting a subset still reads
+the whole file, but returns only the requested bands. Fractional, missing
+and out-of-range indices are rejected.}
 
 \item{validate}{Logical. Check that the file size matches the header before
-reading. Default \code{TRUE}; there is no good reason to disable it.}
+reading. Default \code{TRUE}; there is no good reason to disable it. With
+\code{FALSE}, a file longer than the header implies is read up to the size the
+header describes; a shorter file is still rejected as truncated.}
 }
 \value{
 A numeric array with dimensions \verb{(rows, cols, bands)} — matching the
 convention used by \code{hyperspectR::hsi_cube()} — carrying a \code{wavelengths}
-attribute in nanometres.
+attribute in nanometres. The wavelengths are the nominal axis from
+\code{\link[=tivis_get_wavelengths]{tivis_get_wavelengths()}}, not values stored in the file.
 }
 \description{
 Reads a \verb{*_SpecCube.dat} file written by the Diaspective Vision TIVITA
@@ -28,17 +32,24 @@ binary format, so this package needs no vendor SDK and no compiled code.
 }
 \section{File format}{
 
-The format was determined empirically from reference captures and validated
-against the TIVITA Suite's own \verb{_RGB-Image.png} exports:
+The vendor publishes no specification. The format was determined
+empirically from reference captures, by measuring the periodicity of the
+sample stream itself:
 \itemize{
 \item a 12-byte header of three \strong{big-endian} \code{uint32} values giving
 \code{width}, \code{height} and \code{bands};
 \item followed by \strong{big-endian} \code{float32} samples;
 \item stored \strong{band-interleaved-by-pixel} (BIP): all bands of one pixel are
-contiguous; this reader implements column-major spatial planes
-(y varies fastest).
+contiguous (the autocorrelation of the raw stream peaks at a lag equal to
+the band count);
+\item with column-major spatial planes, y varying fastest (the autocorrelation
+of an extracted band plane peaks at a lag equal to the image height).
 Device/export qualification requires an independent geometry fixture.
 }
+
+An earlier comparison with the Suite's \verb{_RGB-Image.png} export was
+withdrawn as evidence: that image is rotated and rescaled relative to the
+cube and cannot serve as pixel-level ground truth (see \code{NEWS.md}).
 
 Values are calibrated reflectance. They are normally within \verb{[0, 1]} but may
 fall slightly below zero or exceed one in specular and saturated regions, so
@@ -54,5 +65,6 @@ range(attr(cube, "wavelengths"))
 }
 \seealso{
 \code{\link[=tivis_read_header]{tivis_read_header()}} for header-only access,
-\code{\link[=tivis_get_wavelengths]{tivis_get_wavelengths()}} for the wavelength axis.
+\code{\link[=tivis_get_wavelengths]{tivis_get_wavelengths()}} for the wavelength axis,
+\code{\link[=tivis_read_cube_profiled]{tivis_read_cube_profiled()}} to read without assuming a wavelength axis.
 }

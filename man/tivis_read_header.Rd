@@ -13,8 +13,9 @@ tivis_read_header(path, validate = TRUE)
 \code{12 + width * height * bands * 4}. Default \code{TRUE}.}
 }
 \value{
-A named list with \code{width}, \code{height}, \code{bands}, \code{n_values} and
-\code{file_size}.
+A named list with \code{width}, \code{height}, \code{bands} (integers),
+\code{n_values} (the number of samples the header implies,
+\code{width * height * bands}) and \code{file_size} (bytes).
 }
 \description{
 Parses the 12-byte header of a \verb{*_SpecCube.dat} file without reading the

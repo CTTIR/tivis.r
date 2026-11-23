@@ -16,7 +16,8 @@ test_that("cube is returned as (rows, cols, bands)", {
 })
 
 test_that("wavelengths follow the 500 nm / 5 nm grid", {
-  expect_equal(tivis_get_wavelengths(8L), c(500, 505, 510, 515, 520, 525, 530, 535))
+  expect_equal(tivis_get_wavelengths(8L),
+               c(500, 505, 510, 515, 520, 525, 530, 535))
   expect_equal(range(tivis_get_wavelengths(100L)), c(500, 995))
   expect_length(tivis_get_wavelengths(100L), 100L)
   expect_equal(attr(tivis_read_cube(tivis_example_file()), "wavelengths"),
@@ -47,10 +48,14 @@ test_that("the BIP layout round-trips a known cube", {
   # plausible-looking noise. This is the check the original TIVITA reader
   # lacked: array() silently recycles, so a wrong layout produced garbage
   # that still had the right shape.
-  w <- 5L; h <- 3L; nb <- 4L
+  w <- 5L
+  h <- 3L
+  nb <- 4L
   truth <- array(0, dim = c(h, w, nb))
-  for (y in seq_len(h)) for (x in seq_len(w)) for (b in seq_len(nb)) {
-    truth[y, x, b] <- y * 100 + x * 10 + b
+  for (y in seq_len(h)) {
+    for (x in seq_len(w)) {
+      truth[y, x, ] <- y * 100 + x * 10 + seq_len(nb)
+    }
   }
 
   tmp <- tempfile(fileext = "_SpecCube.dat")
@@ -60,9 +65,11 @@ test_that("the BIP layout round-trips a known cube", {
   # pixels are stored column-major: y varies fastest
   flat <- numeric(w * h * nb)
   i <- 1L
-  for (x in seq_len(w)) for (y in seq_len(h)) {
-    flat[i:(i + nb - 1L)] <- truth[y, x, ]
-    i <- i + nb
+  for (x in seq_len(w)) {
+    for (y in seq_len(h)) {
+      flat[i:(i + nb - 1L)] <- truth[y, x, ]
+      i <- i + nb
+    }
   }
   writeBin(flat, con, size = 4L, endian = "big")
   close(con)
@@ -76,8 +83,11 @@ test_that("a single bright pixel lands at the coordinate it was written to", {
   # because it checks the writer against the reader; both were wrong together
   # in an earlier version, and the suite stayed green while band images came
   # out tiled four times across.
-  w <- 7L; h <- 5L; nb <- 3L
-  target_y <- 2L; target_x <- 6L
+  w <- 7L
+  h <- 5L
+  nb <- 3L
+  target_y <- 2L
+  target_x <- 6L
 
   tmp <- tempfile(fileext = "_SpecCube.dat")
   on.exit(unlink(tmp), add = TRUE)
@@ -85,9 +95,11 @@ test_that("a single bright pixel lands at the coordinate it was written to", {
   writeBin(as.integer(c(w, h, nb)), con, size = 4L, endian = "big")
   flat <- numeric(w * h * nb)
   i <- 1L
-  for (x in seq_len(w)) for (y in seq_len(h)) {
-    flat[i:(i + nb - 1L)] <- if (y == target_y && x == target_x) 1 else 0
-    i <- i + nb
+  for (x in seq_len(w)) {
+    for (y in seq_len(h)) {
+      flat[i:(i + nb - 1L)] <- if (y == target_y && x == target_x) 1 else 0
+      i <- i + nb
+    }
   }
   writeBin(flat, con, size = 4L, endian = "big")
   close(con)
@@ -103,17 +115,27 @@ test_that("a single bright pixel lands at the coordinate it was written to", {
 test_that("an asymmetric ramp is not transposed", {
   # Complements the single-pixel test: a gradient that differs along x and y
   # pins the orientation even if a future change preserves point positions.
-  w <- 9L; h <- 4L; nb <- 2L
+  w <- 9L
+  h <- 4L
+  nb <- 2L
   truth <- array(0, dim = c(h, w, nb))
-  for (y in seq_len(h)) for (x in seq_len(w)) truth[y, x, ] <- 10 * y + x
+  for (y in seq_len(h)) {
+    for (x in seq_len(w)) {
+      truth[y, x, ] <- 10 * y + x
+    }
+  }
 
   tmp <- tempfile(fileext = "_SpecCube.dat")
   on.exit(unlink(tmp), add = TRUE)
   con <- file(tmp, "wb")
   writeBin(as.integer(c(w, h, nb)), con, size = 4L, endian = "big")
-  flat <- numeric(w * h * nb); i <- 1L
-  for (x in seq_len(w)) for (y in seq_len(h)) {
-    flat[i:(i + nb - 1L)] <- truth[y, x, ]; i <- i + nb
+  flat <- numeric(w * h * nb)
+  i <- 1L
+  for (x in seq_len(w)) {
+    for (y in seq_len(h)) {
+      flat[i:(i + nb - 1L)] <- truth[y, x, ]
+      i <- i + nb
+    }
   }
   writeBin(flat, con, size = 4L, endian = "big")
   close(con)

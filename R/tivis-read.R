@@ -5,34 +5,46 @@
 #' binary format, so this package needs no vendor SDK and no compiled code.
 #'
 #' @section File format:
-#' The format was determined empirically from reference captures and validated
-#' against the TIVITA Suite's own `_RGB-Image.png` exports:
+#' The vendor publishes no specification. The format was determined
+#' empirically from reference captures, by measuring the periodicity of the
+#' sample stream itself:
 #'
 #' * a 12-byte header of three **big-endian** `uint32` values giving
 #'   `width`, `height` and `bands`;
 #' * followed by **big-endian** `float32` samples;
 #' * stored **band-interleaved-by-pixel** (BIP): all bands of one pixel are
-#'   contiguous; this reader implements column-major spatial planes
-#'   (y varies fastest).
+#'   contiguous (the autocorrelation of the raw stream peaks at a lag equal to
+#'   the band count);
+#' * with column-major spatial planes, y varying fastest (the autocorrelation
+#'   of an extracted band plane peaks at a lag equal to the image height).
 #'   Device/export qualification requires an independent geometry fixture.
+#'
+#' An earlier comparison with the Suite's `_RGB-Image.png` export was
+#' withdrawn as evidence: that image is rotated and rescaled relative to the
+#' cube and cannot serve as pixel-level ground truth (see `NEWS.md`).
 #'
 #' Values are calibrated reflectance. They are normally within `[0, 1]` but may
 #' fall slightly below zero or exceed one in specular and saturated regions, so
 #' the reader does not clamp them.
 #'
 #' @param path Path to a `*_SpecCube.dat` file.
-#' @param bands Optional integer vector of band indices to read. `NULL`
-#'   (default) reads every band. Selecting a subset still reads the whole file,
-#'   but returns only the requested bands.
+#' @param bands Optional integer vector of band indices to read, in the order
+#'   wanted. `NULL` (default) reads every band. Selecting a subset still reads
+#'   the whole file, but returns only the requested bands. Fractional, missing
+#'   and out-of-range indices are rejected.
 #' @param validate Logical. Check that the file size matches the header before
-#'   reading. Default `TRUE`; there is no good reason to disable it.
+#'   reading. Default `TRUE`; there is no good reason to disable it. With
+#'   `FALSE`, a file longer than the header implies is read up to the size the
+#'   header describes; a shorter file is still rejected as truncated.
 #'
 #' @return A numeric array with dimensions `(rows, cols, bands)` — matching the
 #'   convention used by `hyperspectR::hsi_cube()` — carrying a `wavelengths`
-#'   attribute in nanometres.
+#'   attribute in nanometres. The wavelengths are the nominal axis from
+#'   [tivis_get_wavelengths()], not values stored in the file.
 #'
 #' @seealso [tivis_read_header()] for header-only access,
-#'   [tivis_get_wavelengths()] for the wavelength axis.
+#'   [tivis_get_wavelengths()] for the wavelength axis,
+#'   [tivis_read_cube_profiled()] to read without assuming a wavelength axis.
 #'
 #' @examples
 #' f <- tivis_example_file()
@@ -47,22 +59,28 @@ tivis_read_cube <- function(path, bands = NULL, validate = TRUE) {
   h <- hdr$height
   nb <- hdr$bands
 
+  # Validate the selection before touching the samples: a full cube is
+  # about 123 MB, and a bad `bands` should fail without reading it.
+  keep <- if (is.null(bands)) seq_len(nb) else .check_bands(bands, nb)
+
+  # readBin() allocates its result up front. Never ask for more samples than
+  # the file can hold, or a corrupt header read with `validate = FALSE` would
+  # request an arbitrarily large vector.
+  n_values <- hdr$n_values
+  n_available <- floor((hdr$file_size - 12) / 4)
+  if (n_available < n_values) {
+    .abort_truncated(path, n_values, n_available)
+  }
+
   con <- file(path, "rb")
   on.exit(close(con), add = TRUE)
 
   # skip the header, then read every sample
   readBin(con, what = "raw", n = 12L)
-  n_values <- as.double(w) * as.double(h) * as.double(nb)
   v <- readBin(con, what = "double", n = n_values, size = 4L, endian = "big")
-
   if (length(v) != n_values) {
-    cli::cli_abort(c(
-      "Truncated cube: {.file {basename(path)}}.",
-      "x" = "Header promises {.val {n_values}} samples, file yielded {.val {length(v)}}."
-    ))
+    .abort_truncated(path, n_values, length(v))
   }
-
-  keep <- if (is.null(bands)) seq_len(nb) else .check_bands(bands, nb)
 
   # BIP -> (rows, cols, band). Band b occupies every nb-th sample starting at b.
   #
@@ -92,16 +110,24 @@ tivis_read_cube <- function(path, bands = NULL, validate = TRUE) {
 #' @param validate Logical. Verify that the file size equals
 #'   `12 + width * height * bands * 4`. Default `TRUE`.
 #'
-#' @return A named list with `width`, `height`, `bands`, `n_values` and
-#'   `file_size`.
+#' @return A named list with `width`, `height`, `bands` (integers),
+#'   `n_values` (the number of samples the header implies,
+#'   `width * height * bands`) and `file_size` (bytes).
 #'
 #' @examples
 #' tivis_read_header(tivis_example_file())
 #'
 #' @export
 tivis_read_header <- function(path, validate = TRUE) {
+  path <- .check_path(path)
   if (!file.exists(path)) {
     cli::cli_abort("File not found: {.file {path}}")
+  }
+  if (dir.exists(path)) {
+    cli::cli_abort(c(
+      "{.file {path}} is a directory, not a cube file.",
+      "i" = "Use {.fn tivis_list_measurements} to find the cubes below it."
+    ))
   }
 
   con <- file(path, "rb")
@@ -111,7 +137,10 @@ tivis_read_header <- function(path, validate = TRUE) {
   if (length(dims) < 3L || anyNA(dims) || any(dims <= 0L)) {
     cli::cli_abort(c(
       "Not a readable TIVITA cube: {.file {basename(path)}}.",
-      "x" = "The first 12 bytes do not decode to three positive big-endian integers."
+      "x" = paste(
+        "The first 12 bytes do not decode to three positive",
+        "big-endian integers."
+      )
     ))
   }
 
@@ -122,7 +151,10 @@ tivis_read_header <- function(path, validate = TRUE) {
   if (validate && size != expected) {
     cli::cli_abort(c(
       "Header does not describe {.file {basename(path)}}.",
-      "i" = "Header says {dims[1]} x {dims[2]} x {dims[3]}, implying {.val {expected}} bytes.",
+      "i" = paste(
+        "Header says {dims[1]} x {dims[2]} x {dims[3]},",
+        "implying {.val {expected}} bytes."
+      ),
       "x" = "The file is {.val {size}} bytes."
     ))
   }
@@ -136,25 +168,33 @@ tivis_read_header <- function(path, validate = TRUE) {
 
 #' TIVITA Wavelength Axis
 #'
-#' The TIVITA Tissue camera samples 500-995 nm in 5 nm steps. The mapping was
-#' confirmed empirically: correlating each band against the TIVITA Suite's own
-#' greyscale RGB export peaks at band 12, i.e. 555 nm, which is where human
-#' photopic luminous efficiency peaks.
+#' Returns the nominal wavelength axis this reader assumes for a TIVITA
+#' Tissue recording: band `i` is centred at `500 + 5 * (i - 1)` nm, that is
+#' 500-995 nm in 5 nm steps for the native 100 bands.
 #'
-#' @param n_bands Integer number of bands. Default `100L`, the native count.
+#' The cube file stores no wavelengths, so the axis is an assumption of the
+#' reader and is not read from, or checked against, the recording. An earlier
+#' statement that the mapping had been confirmed against the Suite's RGB
+#' export was withdrawn together with that comparison (see `NEWS.md`). Use
+#' [tivis_read_cube_profiled()] when the axis must be declared explicitly
+#' instead of assumed, for example for another TIVITA camera model.
 #'
-#' @return Numeric vector of band centre wavelengths in nanometres.
+#' @param n_bands Number of bands, a single positive whole number. Default
+#'   `100L`, the native count.
+#'
+#' @return Numeric vector of nominal band centre wavelengths in nanometres.
 #'
 #' @examples
 #' range(tivis_get_wavelengths())
 #'
 #' @export
 tivis_get_wavelengths <- function(n_bands = 100L) {
-  n_bands <- as.integer(n_bands)
-  if (length(n_bands) != 1L || is.na(n_bands) || n_bands <= 0L) {
+  n <- suppressWarnings(as.integer(n_bands))
+  fractional <- is.numeric(n_bands) && !isTRUE(all(n_bands == n))
+  if (length(n) != 1L || is.na(n) || n <= 0L || fractional) {
     cli::cli_abort("{.arg n_bands} must be a single positive integer.")
   }
-  500 + 5 * (seq_len(n_bands) - 1)
+  500 + 5 * (seq_len(n) - 1)
 }
 
 
@@ -187,24 +227,62 @@ tivis_available <- function() TRUE
 tivis_example_file <- function() {
   p <- system.file("extdata", "example_SpecCube.dat", package = "tivis.r")
   if (!nzchar(p)) {
-    cli::cli_abort("Example file not found. Is {.pkg tivis.r} installed correctly?")
+    cli::cli_abort(
+      "Example file not found. Is {.pkg tivis.r} installed correctly?"
+    )
   }
   p
 }
 
 
-# Validate a band selection against the band count.
-.check_bands <- function(bands, nb) {
-  bands <- as.integer(bands)
-  if (anyNA(bands)) {
-    cli::cli_abort("{.arg bands} must be coercible to integers without NAs.")
+# Validate a single path argument. `arg` names it in the message.
+.check_path <- function(path, arg = "path", call = rlang::caller_env()) {
+  if (!is.character(path) || length(path) != 1L || is.na(path) ||
+        !nzchar(path)) {
+    cli::cli_abort(
+      "{.arg {arg}} must be a single path (one non-missing string).",
+      call = call
+    )
   }
+  path
+}
+
+# Signal a cube whose file holds fewer samples than its header promises.
+.abort_truncated <- function(path, expected, found,
+                             call = rlang::caller_env()) {
+  cli::cli_abort(
+    c(
+      "Truncated cube: {.file {basename(path)}}.",
+      "x" = paste(
+        "Header promises {.val {expected}} samples,",
+        "the file holds {.val {found}}."
+      )
+    ),
+    call = call
+  )
+}
+
+# Validate a band selection against the band count.
+.check_bands <- function(bands, nb, call = rlang::caller_env()) {
+  ints <- suppressWarnings(as.integer(bands))
+  # as.integer() truncates, so 2.7 would silently select band 2
+  fractional <- is.numeric(bands) && !isTRUE(all(bands == ints))
+  if (anyNA(ints) || fractional) {
+    cli::cli_abort(
+      "{.arg bands} must be whole-number band indices without NAs.",
+      call = call
+    )
+  }
+  bands <- ints
   bad <- bands[bands < 1L | bands > nb]
   if (length(bad)) {
-    cli::cli_abort(c(
-      "{.arg bands} out of range.",
-      "x" = "Requested {.val {bad}}, but the cube has {nb} bands."
-    ))
+    cli::cli_abort(
+      c(
+        "{.arg bands} out of range.",
+        "x" = "Requested {.val {bad}}, but the cube has {nb} band{?s}."
+      ),
+      call = call
+    )
   }
   bands
 }
@@ -239,7 +317,17 @@ tivis_read_cube_profiled <- function(path, wavelengths = NULL, bands = NULL) {
   if (!is.null(wavelengths) &&
         (!is.numeric(wavelengths) || length(wavelengths) != hdr$bands ||
            any(!is.finite(wavelengths)))) {
-    cli::cli_abort("Explicit wavelengths must match source bands.")
+    cli::cli_abort(c(
+      "Explicit wavelengths must match source bands.",
+      "i" = paste(
+        "{.arg wavelengths} must be {hdr$bands} finite number{?s},",
+        "one per band in the file."
+      ),
+      "x" = paste(
+        "Got {.cls {class(wavelengths)[1]}}",
+        "of length {length(wavelengths)}."
+      )
+    ))
   }
   keep <- if (is.null(bands)) {
     seq_len(hdr$bands)
