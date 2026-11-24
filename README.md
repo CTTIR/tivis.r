@@ -5,8 +5,9 @@
 [![R-CMD-check](https://github.com/CTTIR/tivis.r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CTTIR/tivis.r/actions/workflows/R-CMD-check.yaml)
 [![pkgdown](https://github.com/CTTIR/tivis.r/actions/workflows/pkgdown.yaml/badge.svg)](https://cttir.github.io/tivis.r/)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21889970.svg)](https://doi.org/10.5281/zenodo.21889970)
 <!-- badges: end -->
+
+Zenodo DOI reserved for the release: `10.5281/zenodo.21889970` (not yet published).
 
 Read hyperspectral recordings written by the **Diaspective Vision TIVITA
 Suite**, used for intraoperative tissue and perfusion imaging.
