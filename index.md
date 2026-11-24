@@ -1,5 +1,8 @@
 # tivis.r ![tivis.r logo](reference/figures/logo-with-name.png)
 
+Zenodo DOI reserved for the release: `10.5281/zenodo.21889970` (not yet
+published).
+
 Read hyperspectral recordings written by the **Diaspective Vision TIVITA
 Suite**, used for intraoperative tissue and perfusion imaging.
 
